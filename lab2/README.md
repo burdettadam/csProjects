@@ -1,26 +1,5 @@
 Reprogram the Hot Plate solution with 16k by 16k grid using PThreads, shared memory, and synchronization primitives. Run your solution on marylou and determine the execution time for 1, 2, 4, 8, and 16 processors (24 if you can get it).  In addition to the other criteria, set every 20th row to 100 degrees and every 20th column to 0 degrees.  You cant assume that a cell will remain in steady state once it has reached steady state.  
 
-Here is the code I used to initialize the array:
-
-// Every 20 rows = 100
-  for(row = 0; row < GRIDSIZE; row++) {
-    if((row % 20) == 0) {
-      for(col = 0; col < GRIDSIZE; col++) {
-        newplate[row][col] = 100;
-        lockedCells[row][col]=TRUE;
-      }
-    }
-  }
-  // Every 20 cols = 0
-  for(col = 0; col < GRIDSIZE; col++) {
-    if((col % 20) == 0) {
-      for(row = 0; row < GRIDSIZE; row++) {
-        newplate[row][col] = 0;
-        lockedCells[row][col]=TRUE;
-      }
-    }
-  }
-
 You need to compute the number of cells over 50 degrees for every iteration and create a figure plotting the number of cells over 50 degrees for each iteration in your report.
 
 Make sure you use volatile variables for spin loops where one thread will be modifying a variable that another thread is reading.  Otherwise, the compiler may optimize out the read.
