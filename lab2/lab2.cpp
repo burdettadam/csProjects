@@ -161,7 +161,7 @@ int main()
 {
    pthread_t threads[num_threads];
    int rc;
-   int i;
+   long i;
    pthread_barrier_init (&barrier, NULL, num_threads);
    for( i=0; i < num_threads; i++ ){
       if(rc = pthread_create( &threads[i], NULL, HotPlate, (void *)i))
