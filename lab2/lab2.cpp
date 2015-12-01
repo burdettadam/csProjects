@@ -75,7 +75,7 @@ void fillplate(std::vector< std::vector<float> >& current,std::vector< std::vect
     current[200][500]=100.0;
     old[200][500]=100.0;
 }
-void steadystate(int start,int stop,std::vector< std::vector<float> >& currentMatrix,std::vector< std::vector<float> >& lastMatrix){
+void steadystate(int start,int stop, std::vector< std::vector<float> >& currentMatrix,std::vector< std::vector<float> >& lastMatrix){
 
    for (int row = start ; row < stop ;row ++) {
       for (int col = 1 ; col < tableSize-1; col++) {
@@ -92,7 +92,7 @@ void steadystate(int start,int stop,std::vector< std::vector<float> >& currentMa
       }
    }
 }
-void graterThanCount(int id , int start, int stop, std::vector< std::vector<float> >& currentMatrix,std::vector< std::vector<float> >& lastMatrix){
+void graterThanCount(int id , int start, int stop, std::vector< std::vector<float> >& currentMatrix ,std::vector< std::vector<float> >& lastMatrix){
    int my_count = 0 ;
    for (int row = start ; row < stop; row++ ) {
         for (int col = 1 ; col < tableSize-1; col++) {
@@ -146,7 +146,7 @@ void *HotPlate(void *threadid)
    {
       //barrier
       pthread_barrier_wait (&barrier);
-      steadystate(start,stop,currentMatrix,lastMatrix);
+      steadystate(start,stop, currentMatrix,lastMatrix);
       //barrier
       pthread_barrier_wait (&barrier);
       //check
