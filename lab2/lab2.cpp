@@ -107,6 +107,8 @@ void graterThanCount(int id , int start, int stop, std::vector< std::vector<floa
 
 void *HotPlate(void *threadid)
 {
+  printf( "hi Im thread %d \n",(long)threadid );
+
    long tid;
    tid = (long)threadid;
    // get my part of array
@@ -135,11 +137,14 @@ void *HotPlate(void *threadid)
     if (start == 0) {
         start = 1;
     }
-    if (threadid == 0){
+    printf( "before fillplate \n",(long)threadid );
+
+    if ((long)threadid == 0.0){
        //init plate
       fillplate(currentMatrix,lastMatrix);
     }
    
+    printf( "after fillplate \n",(long)threadid );
     
   
    for (int i = 0; i < 97; ++i)
@@ -163,6 +168,8 @@ int main()
    int rc;
    long i;
    pthread_barrier_init (&barrier, NULL, num_threads);
+  printf( "creating threads \n");
+
    for( i=0; i < num_threads; i++ ){
       if(rc = pthread_create( &threads[i], NULL, HotPlate, (void *)i))
          {
