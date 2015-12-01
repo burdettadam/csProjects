@@ -150,7 +150,7 @@ void *HotPlate(void *threadid)
       //barrier
       pthread_barrier_wait (&barrier);
       //check
-      graterThanCount(threadid, start, stop, currentMatrix, lastMatrix)
+      graterThanCount(threadid, start, stop, currentMatrix, lastMatrix);
    }
 
    //cout << "Hello World! Thread ID, " << tid << endl;

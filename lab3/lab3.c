@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
     }
     // -------
     
-    printf("I am proc %d of %d running on %s\n", iproc, nproc,host);
+    //printf("I am proc %d of %d running on %s\n", iproc, nproc,host);
     // each process has an array of VECSIZE double: ain[VECSIZE]
     double ain[VECSIZE], aout[VECSIZE];
     int  ind[VECSIZE];
@@ -229,6 +229,7 @@ int main(int argc, char *argv[])
     double end = When();
 
     if(myrank == root) {
+        printf("vector size %d\n",VECSIZE);
         printf("Time %f\n",end-start);
     }
 }
