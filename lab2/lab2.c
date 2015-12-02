@@ -8,7 +8,7 @@
 pthread_mutex_t mutexA;
 //#define tableSize 16384
 #define MAXTHREADS 24
-#define nthreads 2
+#define nthreads 4
 #define tableSize 16384
 //#define tableSize 8192
 //#define tableSize 2048
