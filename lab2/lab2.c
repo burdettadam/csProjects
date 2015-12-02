@@ -234,14 +234,14 @@ void update(float** lastMatrix, float** currentMatrix, int start, int end) {
     int row,col;
     for ( row = start ; row < end ;row ++) {
       for ( col = 1 ; col < tableSize-1; col++) { // skip edges... could be a bug!!!!!!!!!!!!!
-         pthread_mutex_lock (&mutexA);
+//         pthread_mutex_lock (&mutexA);
          currentMatrix[row][col] =(( lastMatrix[row+1][col]//bottom
               + lastMatrix[row-1][col]//top
               + lastMatrix[row][col+1]//right
               + lastMatrix[row][col-1])//left
              + (4.0 * lastMatrix[row][col])) / 8.0;
          //xi,j (t) = ( xi+1,j (t-1) + xi-1,j(t-1) + xi,j+1(t-1) + xi,j-1(t-1) + 4 * xi,j(t-1))/8
-         pthread_mutex_unlock(&mutexA);
+//         pthread_mutex_unlock(&mutexA);
         }
     }
 }
