@@ -311,7 +311,7 @@ void *HotPlate(void *threadid)
         pthread_mutex_unlock(&mutexA);
       }
    }
-  usedBarrier(tid);
+  //usedBarrier(tid);
    //cout << "Hello World! Thread ID, " << tid << endl;
    pthread_exit(NULL);
 }
