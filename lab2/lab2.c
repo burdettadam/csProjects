@@ -15,7 +15,7 @@ pthread_mutex_t mutexA;
 //#define tableSize 1024
 //#define tableSize 512
 #define EPSILON  0.1
-char barrier_type = 'l';// linear
+char barrier_type = 'k';// linear
 // barrier_type "k"// log
 // barrier_type "p"// libary
 pthread_barrier_t barrier; // barrier synchronization object
@@ -262,7 +262,7 @@ void graterThanCount(int id , int start, int stop, float** currentMatrix ,float*
 
 void *HotPlate(void *threadid)
 {
-  printf( "hi Im thread %ld \n",(long)threadid );
+  //printf( "hi Im thread %ld \n",(long)threadid );
 
    long tid;
 
