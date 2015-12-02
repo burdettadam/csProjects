@@ -343,7 +343,7 @@ int main()
             exit(1);
          }
    }
-  for (i = 0; i < numberOfThreads; i++) {
+  for (i = 0; i < nthreads; i++) {
     pthread_join(threads[i],NULL);
   }
   //reduce count of > EPSILON 
