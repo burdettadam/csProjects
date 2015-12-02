@@ -14,10 +14,14 @@ pthread_mutex_t mutexA;
 #define tableSize 2048
 //#define tableSize 1024
 //#define tableSize 512
+#define EPSILON  0.1
 pthread_barrier_t   barrier; // barrier synchronization object
+float** currentMatrix;
+float** lastMatrix;
+float** tmp;
+int iterations;
+int converged;
 
-std::vector< std::vector<float> > currentMatrix (tableSize, std::vector<float> (tableSize,50))
-, lastMatrix (tableSize, std::vector<float> (tableSize,50));//, tempMatrix (tableSize, vector<float> (tableSize,50));
 double count[tableSize];     // Contain the count found by each thread
 
 typedef struct barrier_node {
@@ -33,7 +37,11 @@ double When()
     gettimeofday(&tp, NULL);
     return ((double) tp.tv_sec + (double) tp.tv_usec * 1e-6);
 }
-void fillplate(std::vector< std::vector<float> >& current,std::vector< std::vector<float> >& old){
+float fabs(float f)
+{
+    return (f > 0.0)? f : -f ;
+}
+void fillplate(float** current,float** old,){
    for (int row = 0 ; row < tableSize; row++ ) {
         for (int col = 0 ; col < tableSize; col++) {
             // the checks will slow you down alot....
@@ -75,28 +83,29 @@ void fillplate(std::vector< std::vector<float> >& current,std::vector< std::vect
     current[200][500]=100.0;
     old[200][500]=100.0;
 }
-void steadystate(int start,int stop, std::vector< std::vector<float> >& currentMatrix,std::vector< std::vector<float> >& lastMatrix){
 
-   for (int row = start ; row < stop ;row ++) {
-      for (int col = 1 ; col < tableSize-1; col++) {
+void update(float** lastMatrix, float** currentMatrix, int start, int end) {
+    int row,col;
+    for ( row = start ; row < end ;row ++) {
+      for ( col = 1 ; col < tableSize-1; col++) { // skip edges... could be a bug!!!!!!!!!!!!!
          pthread_mutex_lock (&mutexA);
-
          currentMatrix[row][col] =(( lastMatrix[row+1][col]//bottom
-                              + lastMatrix[row-1][col]//top
-                              + lastMatrix[row][col+1]//right
-                              + lastMatrix[row][col-1])//left
-                             + (4.0 * lastMatrix[row][col])) / 8.0;
+              + lastMatrix[row-1][col]//top
+              + lastMatrix[row][col+1]//right
+              + lastMatrix[row][col-1])//left
+             + (4.0 * lastMatrix[row][col])) / 8.0;
          //xi,j (t) = ( xi+1,j (t-1) + xi-1,j(t-1) + xi,j+1(t-1) + xi,j-1(t-1) + 4 * xi,j(t-1))/8
-
          pthread_mutex_unlock(&mutexA);
-      }
-   }
+        }
+    }
 }
-void graterThanCount(int id , int start, int stop, std::vector< std::vector<float> >& currentMatrix ,std::vector< std::vector<float> >& lastMatrix){
+void graterThanCount(int id , int start, int stop, float** currentMatrix ,float** lastMatrix){
    int my_count = 0 ;
+   float average;
    for (int row = start ; row < stop; row++ ) {
         for (int col = 1 ; col < tableSize-1; col++) {
-            if (currentMatrix[row][col] > 50.0)
+            average = (currentMatrix[i+1][j] + currentMatrix[i-1][j] + currentMatrix[i][j+1] + currentMatrix[i][j-1]) / 4;
+            if (fabs(average - currentMatrix[row][col]) >= EPSILON )
             {
                 my_count++;
             }
@@ -110,16 +119,17 @@ void *HotPlate(void *threadid)
   printf( "hi Im thread %d \n",(long)threadid );
 
    long tid;
-   tid = (long)threadid;
+
    // get my part of array
     int s;
     int n, start, stop;
     int my_count = 0 ;
     
     n = (tableSize-1)/num_threads;  // number of elements to handle
-    
-    // Get thread's ID (value = 0 or 1 or 2..)
-    s = * (int *) threadid;
+   // Get thread's ID (value = 0 or 1 or 2..)
+    //s = * (int *) threadid;
+    tid = (long)threadid;
+    s = tid;
     
    //  Locate the starting index
     start = s * n;      // Starting index
@@ -137,27 +147,23 @@ void *HotPlate(void *threadid)
     if (start == 0) {
         start = 1;
     }
-    printf( "before fillplate \n",(long)threadid );
-
-    if ((long)threadid == 0.0){
-       //init plate
-      fillplate(currentMatrix,lastMatrix);
-    }
-   
-    printf( "after fillplate \n",(long)threadid );
-    
   
-   for (int i = 0; i < 97; ++i)
+   for (int i = 0; i < iterations; ++i)
    {
-      //barrier
       pthread_barrier_wait (&barrier);
-      steadystate(start,stop, currentMatrix,lastMatrix);
-      //barrier
+      update(lastMatrix, currentMatrix, start, stop);
       pthread_barrier_wait (&barrier);
       //check
-      graterThanCount((long)threadid, start, stop, currentMatrix, lastMatrix);
+      graterThanCount(tid, start, stop, currentMatrix, lastMatrix);
+      pthread_barrier_wait (&barrier);
+      /* Swap the pointers */
+      if (tid == 0){
+        tmp = currentMatrix;
+        currentMatrix = lastMatrix;
+        lastMatrix = tmp;
+      }
    }
-
+  pthread_barrier_wait (&barrier);
    //cout << "Hello World! Thread ID, " << tid << endl;
    pthread_exit(NULL);
 }
@@ -167,9 +173,19 @@ int main()
    pthread_t threads[num_threads];
    int rc;
    long i;
+   int counter;
+   int fifCount;
    pthread_barrier_init (&barrier, NULL, num_threads);
   printf( "creating threads \n");
-
+  currentMatrix = (float **)malloc((theSize + 2) * sizeof(float*));
+  lastMatrix = (float **)malloc((theSize + 2) * sizeof(float*));
+  for (i = 0; i < SIZE; i++) {
+      currentMatrix[i] = (float*)malloc(SIZE * sizeof(float));
+      lastMatrix[i] = (float*)malloc(SIZE * sizeof(float));
+  }
+  fillplate(&currentMatrix,&lastMatrix);
+  iterations = 97;
+  converged = 0;
    for( i=0; i < num_threads; i++ ){
       if(rc = pthread_create( &threads[i], NULL, HotPlate, (void *)i))
          {
@@ -177,5 +193,13 @@ int main()
             exit(1);
          }
    }
-   pthread_exit(NULL);
+  //reduce count of > EPSILON 
+  fifCount = 0;
+  for(counter =0; counter< num_threads; counter++) {
+    fifCount += count[counter];
+  }
+  end = When();
+  printf("Total iterations: %d with %d > EPSILON\n", iterations, fifCount);
+  printf("Total time: %d\n", (end - start));
+  pthread_exit(NULL);
 }
