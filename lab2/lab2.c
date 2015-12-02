@@ -15,7 +15,7 @@ pthread_mutex_t mutexA;
 //#define tableSize 1024
 //#define tableSize 512
 #define EPSILON  0.1
-char barrier_type = 'k';// linear
+char barrier_type = 'p';// linear
 // barrier_type "k"// log
 // barrier_type "p"// libary
 pthread_barrier_t barrier; // barrier synchronization object
