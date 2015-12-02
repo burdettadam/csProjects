@@ -1,23 +1,23 @@
-#include <cstdlib>
-#include <iostream>
+//#include <cstdlib>
+//#include <iostream>
 #include <sys/time.h>
-#include <math.h>
+//#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 pthread_mutex_t mutexA;
 //#define tableSize 16384
 #define MAXTHREADS 24
-#define num_threads 2
+#define nthreads 2
 //#define tableSize 8192
 #define tableSize 2048
 //#define tableSize 1024
 //#define tableSize 512
 #define EPSILON  0.1
-#define barrier_type "l"// linear
-//#define barrier_type "k"// log
-//#define barrier_type "p"// libary
-pthread_barrier_t   barrier; // barrier synchronization object
+char barrier_type = 'l';// linear
+// barrier_type "k"// log
+// barrier_type "p"// libary
+pthread_barrier_t barrier; // barrier synchronization object
 float** currentMatrix;
 float** lastMatrix;
 float** tmp;
@@ -29,10 +29,11 @@ double count[tableSize];     // Contain the count found by each thread
 typedef struct barrier_node {
         pthread_mutex_t count_lock;
         pthread_cond_t ok_to_proceed_up;
+        pthread_cond_t ok_to_proceed_down;
         int count;
 } mylib_barrier_t_internal;
 
-typedef struct barrier_node mylob_logbarrier_t[MAX_THREADS];
+typedef struct barrier_node mylob_logbarrier_t[MAXTHREADS];
 int number_in_barrier = 0;
 pthread_mutex_t logbarrier_count_lock;
 mylob_logbarrier_t barr;
@@ -46,11 +47,10 @@ struct LinearBarrier {
 
 LinearBarrier linearBarrier;
 
-using namespace std;
 void mylib_init_barrier(mylob_logbarrier_t b)
 {
         int i;
-        for (i = 0; i < MAX_THREADS; i++) {
+        for (i = 0; i < MAXTHREADS; i++) {
                 b[i].count = 0;
                 pthread_mutex_init(&(b[i].count_lock), NULL);
                 pthread_cond_init(&(b[i].ok_to_proceed_up), NULL);
@@ -65,7 +65,7 @@ void mylib_logbarrier (mylob_logbarrier_t b, int num_threads, int thread_id)
         i = 2;
         base = 0;
 
-    if (nproc == 1)
+    if (nthreads == 1)
       return;
 
     pthread_mutex_lock(&logbarrier_count_lock);
@@ -130,13 +130,13 @@ void mylib_logbarrier (mylob_logbarrier_t b, int num_threads, int thread_id)
     number_in_barrier--;
     pthread_mutex_unlock(&logbarrier_count_lock);
 }
-void myLinearBarrierInit(mylib_barrier_t *b)
+void myLinearBarrierInit(LinearBarrier *b)
 {
         b -> count = 0;
         pthread_mutex_init(&(b -> count_lock), NULL);
         pthread_cond_init(&(b -> ok_to_proceed), NULL);
 }
-void myLinearBarrier (mylib_barrier_t *b, int num_threads)
+void myLinearBarrier (LinearBarrier *b, int num_threads)
 {
     if (num_threads == 1)
       return;
@@ -151,12 +151,12 @@ void myLinearBarrier (mylib_barrier_t *b, int num_threads)
                 while (pthread_cond_wait(&(b -> ok_to_proceed), &(b -> count_lock)) != 0);
         pthread_mutex_unlock(&(b -> count_lock));
 }
-void barrier(id){
+void usedBarrier(int id){
   if (barrier_type == 'l'){
-    myLinearBarrier(&linearBarrier);
+    myLinearBarrier(&linearBarrier,nthreads);
   }
   else if (barrier_type == 'k'){
-    mylib_logbarrier(barr, num_threads, id);
+    mylib_logbarrier(barr, nthreads, id);
   }
   else //(barrier_type == 'p')
   {
@@ -186,7 +186,7 @@ void destroy() {
   free(lastMatrix);
 }
 
-void fillplate(float** current,float** old,){
+void fillplate(float** current,float** old){
    for (int row = 0 ; row < tableSize; row++ ) {
         for (int col = 0 ; col < tableSize; col++) {
             // the checks will slow you down alot....
@@ -249,7 +249,7 @@ void graterThanCount(int id , int start, int stop, float** currentMatrix ,float*
    float average;
    for (int row = start ; row < stop; row++ ) {
         for (int col = 1 ; col < tableSize-1; col++) {
-            average = (currentMatrix[i+1][j] + currentMatrix[i-1][j] + currentMatrix[i][j+1] + currentMatrix[i][j-1]) / 4;
+            average = (currentMatrix[row+1][col] + currentMatrix[row-1][col] + currentMatrix[row][col+1] + currentMatrix[row][col-1]) / 4;
             if (fabs(average - currentMatrix[row][col]) >= EPSILON )
             {
                 my_count++;
@@ -261,7 +261,7 @@ void graterThanCount(int id , int start, int stop, float** currentMatrix ,float*
 
 void *HotPlate(void *threadid)
 {
-  printf( "hi Im thread %d \n",(long)threadid );
+  printf( "hi Im thread %ld \n",(long)threadid );
 
    long tid;
 
@@ -270,7 +270,7 @@ void *HotPlate(void *threadid)
     int n, start, stop;
     int my_count = 0 ;
     
-    n = (tableSize-1)/num_threads;  // number of elements to handle
+    n = (tableSize-1)/nthreads;  // number of elements to handle
    // Get thread's ID (value = 0 or 1 or 2..)
     //s = * (int *) threadid;
     tid = (long)threadid;
@@ -280,7 +280,7 @@ void *HotPlate(void *threadid)
     start = s * n;      // Starting index
     
    //  Locate the ending index
-    if ( s != (num_threads-1) )
+    if ( s != (nthreads-1) )
     {
         stop = start + n;  // Ending index
     }
@@ -295,12 +295,12 @@ void *HotPlate(void *threadid)
   
    for (int i = 0; i < iterations; ++i)
    {
-      barrier(tid);
+      usedBarrier(tid);
       update(lastMatrix, currentMatrix, start, stop);
-      barrier(tid);
+      usedBarrier(tid);
       //check
       graterThanCount(tid, start, stop, currentMatrix, lastMatrix);
-      barrier(tid);
+      usedBarrier(tid);
       /* Swap the pointers */
       if (tid == 0){
         pthread_mutex_lock (&mutexA);
@@ -310,31 +310,33 @@ void *HotPlate(void *threadid)
         pthread_mutex_unlock(&mutexA);
       }
    }
-  barrier(tid);
+  usedBarrier(tid);
    //cout << "Hello World! Thread ID, " << tid << endl;
    pthread_exit(NULL);
 }
 
 int main()
 {
-   pthread_t threads[num_threads];
+   pthread_t threads[nthreads];
    int rc;
    long i;
    int counter;
    int fifCount;
-   pthread_barrier_init (&barrier, NULL, num_threads);
+   double starttime, endtime;
+   pthread_barrier_init (&barrier, NULL, nthreads);
   printf( "creating threads \n");
-  currentMatrix = (float **)malloc((theSize + 2) * sizeof(float*));
-  lastMatrix = (float **)malloc((theSize + 2) * sizeof(float*));
-  for (i = 0; i < SIZE; i++) {
-      currentMatrix[i] = (float*)malloc(SIZE * sizeof(float));
-      lastMatrix[i] = (float*)malloc(SIZE * sizeof(float));
+  starttime = When();
+  currentMatrix = (float **)malloc((tableSize + 2) * sizeof(float*));
+  lastMatrix = (float **)malloc((tableSize + 2) * sizeof(float*));
+  for (i = 0; i < tableSize; i++) {
+      currentMatrix[i] = (float*)malloc(tableSize * sizeof(float));
+      lastMatrix[i] = (float*)malloc(tableSize * sizeof(float));
   }
-  fillplate(&currentMatrix,&lastMatrix);
+  fillplate(currentMatrix,lastMatrix);
   iterations = 97;
   converged = 0;
-   for( i=0; i < num_threads; i++ ){
-      if(rc = pthread_create( &threads[i], NULL, HotPlate, (void *)i))
+   for( i=0; i < nthreads; i++ ){
+      if((rc = pthread_create( &threads[i], NULL, HotPlate, (void *)i)))
          {
             printf( "Cannot create thread\n");
             exit(1);
@@ -342,12 +344,12 @@ int main()
    }
   //reduce count of > EPSILON 
   fifCount = 0;
-  for(counter =0; counter< num_threads; counter++) {
+  for(counter =0; counter< nthreads; counter++) {
     fifCount += count[counter];
   }
-  end = When();
+  endtime = When();
   destroy();
   printf("Total iterations: %d with %d > EPSILON\n", iterations, fifCount);
-  printf("Total time: %d\n", (end - start));
+  printf("Total time: %f\n", (endtime - starttime));
   pthread_exit(NULL);
 }
