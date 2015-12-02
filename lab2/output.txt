@@ -1,0 +1,70 @@
+LinearB_1Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 520.909177
+LinearB_2Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 262.091301
+LinearB_4Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 134.097811
+LinearB_8Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 75.612158
+LinearB_16Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 42.093568
+LinearB_24Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 33.144683
+LogB_1Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 521.442690
+LogB_1Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 262.109076
+LogB_1Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 134.190957
+LogB_1Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 75.534345
+LogB_1Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 42.247549
+LogB_1Th_lab2
+/var/spool/slurmd/job8910337/slurm_script: line 47: ./LogB_24Th_lab2: No such file or directory
+SysB_1Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 520.843122
+SysB_2Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 262.035318
+SysB_4Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 134.054418
+SysB_8Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 75.485503
+SysB_16Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 42.260613
+SysB_24Th_lab2
+creating threads 
+Total iterations: 97 with 416785 > EPSILON
+Total time: 29.667780
