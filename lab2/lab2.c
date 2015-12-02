@@ -304,11 +304,11 @@ void *HotPlate(void *threadid)
       usedBarrier(tid);
       /* Swap the pointers */
       if (tid == 0){
-        pthread_mutex_lock (&mutexA);
+//        pthread_mutex_lock (&mutexA);
         tmp = currentMatrix;
         currentMatrix = lastMatrix;
         lastMatrix = tmp;
-        pthread_mutex_unlock(&mutexA);
+//        pthread_mutex_unlock(&mutexA);
       }
    }
   //usedBarrier(tid);
