@@ -343,6 +343,7 @@ int main()
             exit(1);
          }
    }
+  printf("before joing\n");
   for (int i = 0; i < nthreads; i++) {
     pthread_join(threads[i],NULL);
   }
