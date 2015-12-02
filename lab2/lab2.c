@@ -313,6 +313,8 @@ void *HotPlate(void *threadid)
    }
   //usedBarrier(tid);
    //cout << "Hello World! Thread ID, " << tid << endl;
+  printf( "hi Im thread %ld \n leaving my thread.",(long)threadid );
+
    pthread_exit(NULL);
 }
 
