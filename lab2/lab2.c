@@ -9,9 +9,9 @@ pthread_mutex_t mutexA;
 //#define tableSize 16384
 #define MAXTHREADS 24
 #define nthreads 2
-//#define tableSize 16384
+#define tableSize 16384
 //#define tableSize 8192
-#define tableSize 2048
+//#define tableSize 2048
 //#define tableSize 1024
 //#define tableSize 512
 #define EPSILON  0.1
@@ -312,8 +312,7 @@ void *HotPlate(void *threadid)
       }
    }
   //usedBarrier(tid);
-   //cout << "Hello World! Thread ID, " << tid << endl;
-  printf( "hi Im thread %ld \n leaving my thread.",(long)threadid );
+  //printf( "hi Im thread %ld \n leaving my thread.",(long)threadid );
 
    pthread_exit(NULL);
 }
@@ -345,7 +344,7 @@ int main()
             exit(1);
          }
    }
-  printf("before joing\n");
+  //printf("before joing\n");
   for (int i = 0; i < nthreads; i++) {
     pthread_join(threads[i],NULL);
   }
