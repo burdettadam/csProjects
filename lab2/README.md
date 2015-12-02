@@ -22,3 +22,6 @@ Results - Graphs of your performance under each strategy you tried.  Discuss why
 Creative Contribution - What did you try and what were the performance results?
 Conclusions - What do you conclude about parallel programming from your experiences in this lab?
 Submit your report through learningsuite along with the URL for the git repository for your code.
+
+how to compile
+g++ -pthread -o <outputname> lab2.c 
