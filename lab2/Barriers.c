@@ -78,23 +78,23 @@ void mylib_logbarrier (mylob_logbarrier_t b, int num_threads, int thread_id)
 
 		pthread_mutex_lock(&logbarrier_count_lock);
 		number_in_barrier++;
-		if (number_in_barrier == nproc)
+	/* I swap else where, with a mutex
+    	if (number_in_barrier == nproc)
 		{
-				/* I am the last one in */
-				/* swap the new value pointer with the old value pointer */
+				// I am the last one in 
+				// swap the new value pointer with the old value pointer 
 				tmp = oplate;
 				oplate = iplate;
 				iplate = tmp;
-				/*
-				fprintf(stderr,"%d: swapping pointers\n", thread_id);
-				*/
+				//fprintf(stderr,"%d: swapping pointers\n", thread_id);
 
-				/* set the keepgoing flag and let everybody go */
+				// set the keepgoing flag and let everybody go 
 				keepgoing = 0;
 				for (q = 0; q < nproc; q++)
 					keepgoing += lkeepgoing[q];	
 		}
-		pthread_mutex_unlock(&logbarrier_count_lock);
+	*/
+    	pthread_mutex_unlock(&logbarrier_count_lock);
 
         do {
                 index = base + thread_id / i;
@@ -102,8 +102,7 @@ void mylib_logbarrier (mylob_logbarrier_t b, int num_threads, int thread_id)
                         pthread_mutex_lock(&(b[index].count_lock));
                         b[index].count ++;
                         while (b[index].count < 2)
-                              pthread_cond_wait(&(b[index].ok_to_proceed_up),
-                                        &(b[index].count_lock));
+                            pthread_cond_wait(&(b[index].ok_to_proceed_up), &(b[index].count_lock));
                         pthread_mutex_unlock(&(b[index].count_lock));
                 }
                 else {
@@ -152,26 +151,14 @@ void mylib_init_barrier(mylib_barrier_t *b)
 
 void mylib_barrier (mylib_barrier_t *b, int num_threads)
 {
-		int i;
-		float *tmp;
 		if (num_threads == 1)
 			return;
         pthread_mutex_lock(&(b -> count_lock));
         b -> count ++;
         if (b -> count == num_threads) 
 		{
-				/* I am the last one in */
-				/* swap the new value pointer with the old value pointer */
-				tmp = oplate;
-				oplate = iplate;
-				iplate = tmp;
-
-				/* set the keepgoing flag and let everybody go */
-				keepgoing = 0;
-				for (i = 0; i < nproc; i++)
-					keepgoing += lkeepgoing[i];
-                b -> count = 0;
-                pthread_cond_broadcast(&(b -> ok_to_proceed));
+            b -> count = 0;
+            pthread_cond_broadcast(&(b -> ok_to_proceed));
         }
         else
                 while (pthread_cond_wait(&(b -> ok_to_proceed), &(b -> count_lock)) != 0);

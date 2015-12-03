@@ -12,6 +12,12 @@ LFLAGS     		= -L$(MPI_LIB) -lm -lmpich
 $(TARGET): $(SRC)
 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
 
+pi: pi.c
+	$(CC) $(CFLAGS) pi.c -o pi
+
+next: next.c
+	$(CC) $(CFLAGS) next.c -o next
+
 run: $(TARGET)
 	./$(TARGET) -p4pg $(TARGET).cfg
 
