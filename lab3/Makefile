@@ -5,7 +5,7 @@ MPI_LIB         = $(MPI_HOME)/lib
 SRC   			= lab3.c
 TARGET     		= lab3
 
-CC         		= $(MPI_HOME)/bin/mpic++
+CC         		= $(MPI_HOME)/bin/mpicc
 CFLAGS			= -O -I$(MPI_INCL) -lm
 LFLAGS     		= -lm -L$(MPI_LIB) -lmpich 
 
