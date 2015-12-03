@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
         // fill with random numbers-----------?
         for(i = 0; i < VECSIZE; i++) {
             ain[i] = rand();
-        //              printf("init proc %d [%d]=%f\n",myrank,i,ain[i]);
+                      printf("init proc %d [%d]=%f\n",myrank,i,ain[i]);
         }
         for (i = 0; i < VECSIZE; ++i) {
             in[i].val = ain[i];
