@@ -12,7 +12,7 @@
 #include <mpi.h>
 #include <math.h>
 
-#define VECSIZE 1 // numbers on each node?
+#define VECSIZE 20 // numbers on each node?
 #define ITERATIONS 10000 //
 struct node{
     double val;
