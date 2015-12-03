@@ -7,7 +7,7 @@
 //
 // the spec says to do some different nodes, only do power of 2 node structure.
 #include <stdio.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <sys/time.h>
 #include <mpi.h>
 #include <math.h>
