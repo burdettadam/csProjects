@@ -233,11 +233,11 @@ int main(int argc, char *argv[])
         MPI_Barrier( MPI_COMM_WORLD ) ; 
         //MPI_Finalize(); // does not pass till everyone else as made it there...
         double end = When();
-        timeSum += (end-start)
+        timeSum += (end-start);
     }
     MPI_Finalize(); // does not pass till everyone else as made it there...
     if(myrank == root) {
         printf("vector run itters:  %d\n",avcounter);
-        printf("Time %f\n",(timeSum / avcounter);
+        printf("Time %f\n",(timeSum / avcounter));
     }
 }
