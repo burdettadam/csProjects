@@ -6,8 +6,8 @@ SRC   			= lab3.c
 TARGET     		= lab3
 
 CC         		= $(MPI_HOME)/bin/mpic++
-CFLAGS			= -O -I$(MPI_INCL)
-LFLAGS     		= -lm -L$(MPI_LIB) -lmpich
+CFLAGS			= -O -I$(MPI_INCL) -lm
+LFLAGS     		= -lm -L$(MPI_LIB) -lmpich 
 
 $(TARGET): $(SRC)
 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
