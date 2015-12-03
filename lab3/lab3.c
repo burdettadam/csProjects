@@ -103,13 +103,10 @@ void Bcast(struct node* value, int count , MPI_Datatype datatype, MPI_Comm commu
  void ReduceMax(struct node* send_data, struct node* recv_data, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm communicator, int numdim)
  {
     int myrank;
-    char host[150];
-    int namelen;
     //get rank so we dont have to pass as parameter.
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
     int rank = myrank;
-    MPI_Get_processor_name(host,&namelen);
-    printf("Hello world (Rank: %d / Host: %s)\n", rank, host);
+
     int notparticipating = 0;
     int bitmask = 1;
     int curdim ;
@@ -177,7 +174,7 @@ int main(int argc, char *argv[])
     }
     // -------
     
-    //printf("I am proc %d of %d running on %s\n", iproc, nproc,host);
+    printf("I am proc %d of %d running on %s\n", iproc, nproc,host);
     // each process has an array of VECSIZE double: ain[VECSIZE]
     double ain[VECSIZE], aout[VECSIZE];
     int  ind[VECSIZE];
