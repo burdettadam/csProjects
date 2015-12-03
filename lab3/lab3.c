@@ -110,6 +110,7 @@ void Bcast(struct node* value, int count , MPI_Datatype datatype, MPI_Comm commu
     int notparticipating = 0;
     int bitmask = 1;
     int curdim ;
+    int i;
     struct node newvalue[count];
     MPI_Status status;
     
@@ -123,7 +124,7 @@ void Bcast(struct node* value, int count , MPI_Datatype datatype, MPI_Comm commu
                 MPI_Recv(&newvalue, count, datatype , msg_src, 0 , communicator , &status );
              //         printf("rank %d MPI_Recv from %d with %f" ,rank,msg_src,newvalue[0].val);
               //        printf(" self  %f ",send_data[0].val);
-                for (int i =0 ; i < count; i ++){
+                for (i =0 ; i < count; i ++){
 
                     if (send_data[i].val > newvalue[i].val){
                         recv_data[i] = send_data[i];
