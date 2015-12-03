@@ -12,7 +12,7 @@
 #include <mpi.h>
 #include <math.h>
 
-#define VECSIZE 1 // numbers on each node?
+#define VECSIZE 65536 // numbers on each node?
 #define ITERATIONS 10000 //
 struct node{
     double val;
@@ -189,48 +189,55 @@ int main(int argc, char *argv[])
     // Start time here
     /* Intializes random number generator */ // what should myrank be at beginng
     srand(myrank+5);
-    double start = When();
-    for(iter = 0; iter < ITERATIONS; iter++) {
-        // fill with random numbers-----------?
-        for(i = 0; i < VECSIZE; i++) {
-            ain[i] = rand();
-        //              printf("init proc %d [%d]=%f\n",myrank,i,ain[i]);
-        }
-        for (i = 0; i < VECSIZE; ++i) {
-            in[i].val = ain[i];
-            in[i].rank = myrank;
-        }
-        //MPI_Reduce( in, out, VECSIZE, MPI_DOUBLE_INT, MPI_MAXLOC, root, MPI_COMM_WORLD);
-
-        ReduceMax(in, out, VECSIZE, MPI_DOUBLE_INT, MPI_MAXLOC, root, MPI_COMM_WORLD, numdim);
-       
-        
-        // At this point, the answer resides on process root
-        if (myrank == root) {
-            /* read ranks out
-             */
-            for (i=0; i<VECSIZE; ++i) {
-             //                   printf("root out[%d] = %f from process %d\n",i,out[i].val,out[i].rank);
-                aout[i] = out[i].val;
-                ind[i] = out[i].rank;
+    int average, av, avcounter = 0;
+    double timeSum = 0;
+    for (av = 0 ; av <65536 ; av * 2 ){
+        avcounter ++;
+        double start = When();
+        for(iter = 0; iter < ITERATIONS; iter++) {
+            // fill with random numbers-----------?
+            for(i = 0; i < av; i++) {
+                ain[i] = rand();
+            //              printf("init proc %d [%d]=%f\n",myrank,i,ain[i]);
             }
+            for (i = 0; i < av; ++i) {
+                in[i].val = ain[i];
+                in[i].rank = myrank;
+            }
+            //MPI_Reduce( in, out, av, MPI_DOUBLE_INT, MPI_MAXLOC, root, MPI_COMM_WORLD);
+
+            ReduceMax(in, out, av, MPI_DOUBLE_INT, MPI_MAXLOC, root, MPI_COMM_WORLD, numdim);
+           
+            
+            // At this point, the answer resides on process root
+            if (myrank == root) {
+                /* read ranks out
+                 */
+                for (i=0; i<av; ++i) {
+                 //                   printf("root out[%d] = %f from process %d\n",i,out[i].val,out[i].rank);
+                    aout[i] = out[i].val;
+                    ind[i] = out[i].rank;
+                }
+            }
+
+
+            // Now broadcast this max vector to everyone else.
+           // MPI_Bcast(out, av, MPI_DOUBLE_INT, root, MPI_COMM_WORLD);
+
+            Bcast(out, av, MPI_DOUBLE_INT, MPI_COMM_WORLD, numdim);
+
+          //  for(i = 0; i < av; i++) {
+          //                printf("final proc %d [%d]=%f from %d\n",myrank,i,out[i].val,out[i].rank);
+          //  }
         }
-
-
-        // Now broadcast this max vector to everyone else.
-       // MPI_Bcast(out, VECSIZE, MPI_DOUBLE_INT, root, MPI_COMM_WORLD);
-
-        Bcast(out, VECSIZE, MPI_DOUBLE_INT, MPI_COMM_WORLD, numdim);
-
-      //  for(i = 0; i < VECSIZE; i++) {
-      //                printf("final proc %d [%d]=%f from %d\n",myrank,i,out[i].val,out[i].rank);
-      //  }
+        MPI_Barrier( MPI_COMM_WORLD ) ; 
+        //MPI_Finalize(); // does not pass till everyone else as made it there...
+        double end = When();
+        timeSum += (end-start)
     }
     MPI_Finalize(); // does not pass till everyone else as made it there...
-    double end = When();
-
     if(myrank == root) {
-        printf("vector size %d\n",VECSIZE);
-        printf("Time %f\n",end-start);
+        printf("vector run itters:  %d\n",avcounter);
+        printf("Time %f\n",(timeSum / avcounter);
     }
 }
