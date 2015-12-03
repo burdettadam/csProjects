@@ -13,7 +13,7 @@
 #include <math.h>
 
 #define VECSIZE 20480 // numbers on each node?
-#define ITERATIONS 10000 //
+#define ITERATIONS 100 //
 struct node{
     double val;
     int   rank;
