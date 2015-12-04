@@ -168,7 +168,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    MPI_Finalize();
 
     /* print out the number of iterations to relax */
     if (iproc == 0) {
@@ -176,6 +175,7 @@ int main(int argc, char *argv[])
         printf("%d: Total time: %f\n", iproc, (When() - starttime));
     }
     //MPI_FicurrentMatrixlize(); // what is this for ?????
+    MPI_Finalize();
 }
     
 
