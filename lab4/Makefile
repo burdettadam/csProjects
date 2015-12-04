@@ -6,7 +6,7 @@ SRC   			= lab4.c
 TARGET     		= lab4
 
 CC         		= $(MPI_HOME)/bin/mpicc
-CFLAGS			= -O -I$(MPI_INCL) -lm
+CFLAGS			= -O -I$(MPI_INCL) -lm -std=c99
 LFLAGS     		= -lm -L$(MPI_LIB) -lmpich 
 
 $(TARGET): $(SRC)
