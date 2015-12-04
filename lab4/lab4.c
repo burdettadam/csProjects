@@ -167,7 +167,12 @@ int main(int argc, char *argv[])
             reallydone = 1 ;
         }
     }
-
+    for( int i =0; i < SIZE; i++) {
+        free(currentMatrix[i]);
+        free(lastMatrix[i]);
+      }
+      free(currentMatrix);
+      free(lastMatrix);
 
     /* print out the number of iterations to relax */
     if (iproc == 0) {
