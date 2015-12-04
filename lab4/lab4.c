@@ -4,8 +4,8 @@
 #include <sys/time.h>
 
 
-#define SIZE     4096
-//#define SIZE     16384
+//#define SIZE     4096
+#define SIZE     16384
 #define EPSILON  0.1
 
 float f_abs(float f){
