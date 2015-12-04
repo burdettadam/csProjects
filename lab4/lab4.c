@@ -1,21 +1,36 @@
 #include <mpi.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/time.h>
 
 
-//#define SIZE     1024
-#define SIZE     16384
+#define SIZE     4096
+//#define SIZE     16384
 #define EPSILON  0.1
 
-float fabs(float f);
-double When();
-int EPSILONcheck(float** currentMatrix, int start, int end) {
+float f_abs(float f){
+    return (f > 0.0)? f : -f ;
+}
+/* Return the correct time in seconds, using a double precision number.       */
+double
+When(){
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    return ((double) tp.tv_sec + (double) tp.tv_usec * 1e-6);
+}
+int EPSILONcheck(float** currentMatrix,float** old, int start, int end) {
     int i,j;
     float average;
+    float delta = 0.0;
     for (i = start; i < end; i++) {
-        for (j = 0; j < SIZE; j++) {
-            average = (currentMatrix[i+1][j] + currentMatrix[i-1][j] + currentMatrix[i][j+1] + currentMatrix[i][j-1]) / 4;
-            if (fabs(average - currentMatrix[i][j]) >= EPSILON) {
+        for (j = 1; j < SIZE - 1; j++) {
+          //  average = (currentMatrix[i+1][j] + currentMatrix[i-1][j] + currentMatrix[i][j+1] + currentMatrix[i][j-1]) / 4;
+          //  if (f_abs(average - currentMatrix[i][j]) >= EPSILON) {
+          //      return 0;
+          //  }
+            delta = f_abs((currentMatrix[i][j] - old[i][j]));
+        
+            if (delta > 0.0500) {
                 return 0;
             }
         }
@@ -25,7 +40,7 @@ int EPSILONcheck(float** currentMatrix, int start, int end) {
 void update(float** lastMatrix, float** currentMatrix, int start, int end) {
     int row,col;
     for ( row = start ; row < end ;row ++) {
-      for ( col = 1 ; col < SIZE-1; col++) { // skip edges... could be a bug!!!!!!!!!!!!!
+      for ( col = 1 ; col < SIZE - 1; col++) { // skip edges... could be a bug!!!!!!!!!!!!!
          currentMatrix[row][col] =(( lastMatrix[row+1][col]//bottom
               + lastMatrix[row-1][col]//top
               + lastMatrix[row][col+1]//right
@@ -39,8 +54,8 @@ void fillplate(float** current,float** old, int num_rows_assigned,int iproc){
     int row = 0 ;
     int diff = (iproc * num_rows_assigned);
     int tableSize = SIZE;
-   for (int rowi = 0 ; rowi < num_rows_assigned; rowi++ ) {
-        row = rowi + diff;
+   for (int rowi = 1 ; rowi < num_rows_assigned+1; rowi++ ) {
+        row = rowi-1 + diff;
         for (int col = 0 ; col < tableSize; col++) {
             // the checks will slow you down alot....
             if (row == 0 || col == 0 || col == tableSize-1 ){
@@ -57,6 +72,7 @@ void fillplate(float** current,float** old, int num_rows_assigned,int iproc){
             }
         }
     }
+
     /* no constant cells so I dont need to fill these cells
     if (diff >= 400 && ((iproc+1)* num_rows_assigned) >  )
     for (int col = 0; col < 331 ; col++) {
@@ -68,7 +84,8 @@ void fillplate(float** current,float** old, int num_rows_assigned,int iproc){
     old[200][500]=100.0;
     */
 }
-void main(int argc, char *argv[])
+
+int main(int argc, char *argv[])
 {
     // varibles 
     float **currentMatrix, **lastMatrix, **tmp;
@@ -101,9 +118,9 @@ void main(int argc, char *argv[])
     }
     start = 1;
     end = theSize + 1;
-
     /* Initialize the cells */
     fillplate(currentMatrix,lastMatrix, theSize, iproc);
+
 
     if (iproc == 0)
     {
@@ -128,8 +145,8 @@ void main(int argc, char *argv[])
         if (iproc != nproc - 1)
         {
             // non blocking send
-            MPI_Isend(lastMatrix[num_rows_assigned], SIZE, MPI_FLOAT, iproc + 1, 0, MPI_COMM_WORLD, &request);
-            MPI_Recv(lastMatrix[num_rows_assigned+1], SIZE, MPI_FLOAT, iproc + 1, 0, MPI_COMM_WORLD, &status);
+            MPI_Isend(lastMatrix[theSize], SIZE, MPI_FLOAT, iproc + 1, 0, MPI_COMM_WORLD, &request);
+            MPI_Recv(lastMatrix[theSize+1], SIZE, MPI_FLOAT, iproc + 1, 0, MPI_COMM_WORLD, &status);
         }
 
 
@@ -137,7 +154,7 @@ void main(int argc, char *argv[])
         update(lastMatrix, currentMatrix,start,end);
 
         /* Check to see if we are done */
-        done = EPSILONcheck(currentMatrix,start,end);
+        done = EPSILONcheck(currentMatrix, lastMatrix ,start,end);
 
         /* Do a reduce to see if everybody is done */
         MPI_Allreduce(&done, &reallydone, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
@@ -146,7 +163,12 @@ void main(int argc, char *argv[])
         tmp = currentMatrix;
         currentMatrix = lastMatrix;
         lastMatrix = tmp;
+        if (cnt == 360-1){
+            reallydone = 1 ;
+        }
     }
+
+    MPI_Finalize();
 
     /* print out the number of iterations to relax */
     if (iproc == 0) {
@@ -154,19 +176,7 @@ void main(int argc, char *argv[])
         printf("%d: Total time: %f\n", iproc, (When() - starttime));
     }
     //MPI_FicurrentMatrixlize(); // what is this for ?????
-    MPI_Finalize();
 }
     
-float fabs(float f)
-{
-    return (f > 0.0)? f : -f ;
-}
 
-/* Return the correct time in seconds, using a double precision number.       */
-double
-When()
-{
-    struct timeval tp;
-    gettimeofday(&tp, NULL);
-    return ((double) tp.tv_sec + (double) tp.tv_usec * 1e-6);
-}
+
