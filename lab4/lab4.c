@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &nproc);
     MPI_Comm_rank(MPI_COMM_WORLD, &iproc);
     // say hello 
-   // fprintf(stderr,"%d: Hello from %d of %d\n", iproc, iproc, nproc);
+    // fprintf(stderr,"%d: Hello from %d of %d\n", iproc, iproc, nproc);
     
     /* Determine how much I should be doing and allocate the arrays*/
     theSize = SIZE / nproc;
