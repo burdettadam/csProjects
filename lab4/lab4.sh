@@ -2,7 +2,7 @@
 
 #SBATCH --time=00:10:00   # walltime
 #SBATCH --nodes=24   # number of nodes
-#SBATCH --mem-per-cpu=1024M   # memory per CPU core
+#SBATCH --mem-per-cpu=2024M   # memory per CPU core
 #SBATCH -J "lab2"   # job name
 #SBATCH --mail-user=burdettadam@gmail.com   # email address
 #SBATCH --mail-type=BEGIN
