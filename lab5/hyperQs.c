@@ -50,8 +50,8 @@ int median(int n,  int x[]) {
         pivot = 0.0;
     }
     else{
-        for(int i=0; i<n; i++)
-            printf("[%d]=%ld ",i,x[i]);
+  //      for(int i=0; i<n; i++)
+  //          printf("[%d]=%ld ",i,x[i]);
         if(n%2==0) {
             // if there is an even number of elements, return mean of the two elements in the middle
             pivot = ((x[n/2] + x[n/2 - 1]) / 2.0 );
@@ -60,7 +60,7 @@ int median(int n,  int x[]) {
             pivot = x[n/2];
         }
     }
-    printf("pivot %ld\n",pivot );
+//    printf("pivot %ld\n",pivot );
     return pivot;
 }
 
@@ -130,38 +130,38 @@ int main(int argc, char *argv[])
         MPI_Comm_split(comm1, membershipKey, rank2, &comm2);  // Break up the cube into two subcubes:
         MPI_Comm_rank(comm2,&rank2);
         if ( mediansPivot  ){
-            printf("meadians \n");
+        //    printf("meadians \n");
             if (rank == 0 ){
                 sub_avgs =(int *) malloc(sizeof( int) * nproc);
 
             }
                 pivot = median(size,c);
-                printf("before gather pivot = %ld\n",pivot);
+       //         printf("before gather pivot = %ld\n",pivot);
                 MPI_Gather(&pivot, 1, MPI_INT, sub_avgs, 1, MPI_INT, 0, MPI_COMM_WORLD);
                 if ( rank == 0){
-                    for(int i=0; i<nproc; i++)
-                        printf("[%d]=%ld ",i,sub_avgs[i]);
-                    printf("Gathered\n");
+        //            for(int i=0; i<nproc; i++)
+        //                printf("[%d]=%ld ",i,sub_avgs[i]);
+        //            printf("Gathered\n");
                     pivot = median(nproc,sub_avgs);
                     free(sub_avgs);
                 }
         }
         else if ( rank2 == 0 && (medianPivot || meanPivot || randomPivot)){// Node 0 broadcasts its median key K to the rest of the cube.
             if (meanPivot  ){
-            printf("mean \n");
+     //       printf("mean \n");
 
                 pivot = mean(size,c);
             }
             else if (medianPivot ){
-            printf("meadian \n");
+     //       printf("meadian \n");
                 pivot = median(size,c);
             }
             else if (randomPivot ){
-            printf("randomPivot \n");
+     //       printf("randomPivot \n");
             int randompiv = rand()%size ;
-            printf("randomindex %d \n",randompiv );
+     //       printf("randomindex %d \n",randompiv );
                 pivot = c[randompiv];
-            printf("Pivot %d \n", pivot);
+      //      printf("Pivot %d \n", pivot);
             }
         }
         MPI_Bcast(&pivot,1,MPI_INT, 0, comm2);
@@ -187,12 +187,12 @@ int main(int argc, char *argv[])
         MPI_Intercomm_create(comm2, 0, comm1, 1, 99, &intercomm);
 //    Each node in the lower subcube sends its items whose keys are > K to its adjacent node in the upper subcube
             MPI_Send(aupper, upperSize, MPI_INT, rank2, 0, intercomm ); 
-            printf("upperSize %ld ",upperSize);
+         //   printf("upperSize %ld ",upperSize);
 
-            printf("worldrank %d localrank %d sending upper\n ",rank, rank2);
-            for(i = 0; i < (upperSize); i++)
-                printf("[%d] = %ld ", i,aupper[i]);
-            printf("to otherrank %d \n ", rank2);
+         //   printf("worldrank %d localrank %d sending upper\n ",rank, rank2);
+        //    for(i = 0; i < (upperSize); i++)
+         //       printf("[%d] = %ld ", i,aupper[i]);
+         //   printf("to otherrank %d \n ", rank2);
               
               MPI_Probe(rank2, 0, intercomm, &status);
               MPI_Get_count(&status, MPI_INT, &number_amount);
@@ -203,25 +203,25 @@ int main(int argc, char *argv[])
             //    with the one it kept so that its items are one again sorted.
             free(c);
             c = ARRAY_CONCAT(int, alower, lowerSize, buf,number_amount);
-            printf("worldrank %d localrank %d gotsize %d\n",rank, rank2, number_amount);
+          //  printf("worldrank %d localrank %d gotsize %d\n",rank, rank2, number_amount);
             size = number_amount+lowerSize;
 
-               for(i = 0; i < (number_amount); i++)
+     /*          for(i = 0; i < (number_amount); i++)
                 printf("[%d]=%ld ",i,buf[i]);
             printf("\n ");
             for(i = 0; i < size; i++)
                 printf("[%d]=%ld ",i,c[i]);
 
-            printf("\n ");
+            printf("\n "); */
         }else{
         MPI_Intercomm_create(comm2, 0, comm1, 0, 99, &intercomm);
 //    Each node in the upper subcube sends its items whose keys are <= K to its adjacent node in the lower subcube
               MPI_Send(alower, lowerSize, MPI_INT, rank2, 0, intercomm ); 
-            printf("lowerSize %ld ",lowerSize);
-            printf("worldrank %d localrank %d sending lower\n ",rank, rank2);
-            for(i = 0; i < (lowerSize); i++)
-                printf("[%d]=%ld ",i,alower[i]);
-            printf("to otherrank %d \n ", rank2);
+      //      printf("lowerSize %ld ",lowerSize);
+        //    printf("worldrank %d localrank %d sending lower\n ",rank, rank2);
+         //   for(i = 0; i < (lowerSize); i++)
+         //       printf("[%d]=%ld ",i,alower[i]);
+         //   printf("to otherrank %d \n ", rank2);
 
               MPI_Probe(rank2, 0, intercomm, &status); // dinamically recive
               MPI_Get_count(&status, MPI_INT, &number_amount);
@@ -235,13 +235,13 @@ int main(int argc, char *argv[])
             c = ARRAY_CONCAT(int, aupper, upperSize, buf,number_amount);
             size = number_amount+upperSize;
 
-            printf("worldrank %d localrank %d gotsize %d\n",rank, rank2, number_amount);
+       /*     printf("worldrank %d localrank %d gotsize %d\n",rank, rank2, number_amount);
             for(i = 0; i < (number_amount); i++)
                 printf("[%d]=%ld ",i,buf[i]);
             printf("\n ");
             for(i = 0; i < size; i++)
                 printf("[%d]=%ld ",i,c[i]);
-            printf("\n ");
+            printf("\n "); */
         }
         qsort(c, size, sizeof(int), cmpfunc); // Each node sorts the items it has using quicksort.
 
