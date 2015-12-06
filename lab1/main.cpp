@@ -29,7 +29,7 @@ int main(int argc, const char * argv[]) {
         iterations++;
         greaterThanFifty = simulator.countGreaterFifty(currentMatrix);
         if (cnt == 360-1){
-            reallydone = 1 ;
+            delta = 0.025 ;
         }
         cnt ++;
     }
