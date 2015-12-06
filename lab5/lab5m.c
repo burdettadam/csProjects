@@ -12,7 +12,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdbool.h>
-#define VECSIZE 88 // numbers on each node?
+#define VECSIZE 176 // numbers on each node?
 bool mediansPivot = false;
 bool medianPivot = true;
 bool randomPivot = false;
