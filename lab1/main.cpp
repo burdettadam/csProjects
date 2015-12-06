@@ -13,7 +13,7 @@ int main(int argc, const char * argv[]) {
     Simulator simulator;
     double start =0.0, end = 0.0,time=0.0;
     start = simulator.When();
-    int iterations = 0 , greaterThanFifty = 0, cnt = 0 ;
+    int iterations = 0 , greaterThanFifty = 0 ;
     float delta = 3.0;
     vector< vector<float> > currentMatrix(tableSize, vector<float> (tableSize,50))
     , lastMatrix (tableSize, vector<float> (tableSize,50));//, tempMatrix (tableSize, vector<float> (tableSize,50));
@@ -28,10 +28,6 @@ int main(int argc, const char * argv[]) {
         delta = simulator.checkSteadyState(currentMatrix, lastMatrix);
         iterations++;
         greaterThanFifty = simulator.countGreaterFifty(currentMatrix);
-        if (cnt == 360-1){
-            delta = 0.025 ;
-        }
-        cnt ++;
     }
   
     end = simulator.When();
