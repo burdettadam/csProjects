@@ -41,7 +41,7 @@ float mean(int m, int a[]) {
     return((float)sum/m);
 }
 int median(int n,  int x[]) {
-    printf("\n\n\n n = %d, \n\n\n",n);
+   // printf("\n\n\n n = %d, \n\n\n",n);
     int pivot;
     if ( n == 1 ){
         pivot = x[0];
