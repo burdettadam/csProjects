@@ -14,7 +14,7 @@
 
 #define MAXTASKS      8192
 /* Change the next four parameters to suit your case */
-#define STARTSIZE     100000
+#define STARTSIZE     1408
 #define ENDSIZE       1000000
 #define INCREMENT     100000
 #define ROUNDTRIPS    100
@@ -84,7 +84,7 @@ if (rank < numtasks/2) {
     bestbw = 0.0;
     worstbw = .99E+99;
     totalbw = 0.0;
-    nbytes =  sizeof(char) * n;
+    nbytes =  sizeof(int) * n;
     for (i=1; i<=rndtrps; i++){
       t1 = MPI_Wtime();
       MPI_Send(&msgbuf, n, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
