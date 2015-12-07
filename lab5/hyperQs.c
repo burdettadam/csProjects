@@ -12,7 +12,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdbool.h>
-#define VECSIZE 44 // numbers on each node?
+#define VECSIZE 1408 // numbers on each node?
 bool mediansPivot = false;
 bool medianPivot = false;
 bool randomPivot = true;
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
         case 1: numdim = 0;break;
     }
     // -------
-    
+    // Execution Time = MyPortionSortTime + NumSteps * (PivotSelection + Exchange + CompareData)
     // each process has an array of VECSIZE double: ain[VECSIZE]
      int ain[VECSIZE], *buf, *c = (int *) malloc(VECSIZE * sizeof(int));
     int size = VECSIZE;
@@ -109,7 +109,8 @@ int main(int argc, char *argv[])
     
     /* Intializes random number generator */
     srand(rank+5);
-    double start = When();
+    double start = When(),MyPortionSortTime,randomfill = When(),randomfillend, MyPortionSortTimeend, MyPortion =0 , NumSteps = numdim, PivotSelection,PivotSel =0 ,PivotSelectionend,Exchange,Exchan = 0,Exchangeend,CompareData,CompareDa = 0,CompareDataend;
+
 // Distribute the items evenly to all of the nodes.
         // fill with random numbers
         for(i = 0; i < VECSIZE; i++) {
@@ -117,6 +118,7 @@ int main(int argc, char *argv[])
             //          printf("init proc %d [%d]=%d\n",myrank,i,ain[i]);
         }
         memcpy(c,ain,sizeof(ain));
+
         qsort(c, size, sizeof(int), cmpfunc); // Each node sorts the items it has using quicksort.
     
     
@@ -124,76 +126,62 @@ int main(int argc, char *argv[])
     rank2 = rank ;
     int lowerSize = 0 ,upperSize = 0;
     int *sub_avgs = NULL;
+    randomfillend = When();
     for(int curdim = 0; curdim < numdim; curdim++ ) {
-
+        PivotSelection = When();
         membershipKey = rank2 % 2; // creates two groups o and 1.
         MPI_Comm_split(comm1, membershipKey, rank2, &comm2);  // Break up the cube into two subcubes:
         MPI_Comm_rank(comm2,&rank2);
+        
+
         if ( mediansPivot  ){
-        //    printf("meadians \n");
             if (rank == 0 ){
                 sub_avgs =(int *) malloc(sizeof( int) * nproc);
 
             }
                 pivot = median(size,c);
-       //         printf("before gather pivot = %ld\n",pivot);
                 MPI_Gather(&pivot, 1, MPI_INT, sub_avgs, 1, MPI_INT, 0, MPI_COMM_WORLD);
                 if ( rank == 0){
-        //            for(int i=0; i<nproc; i++)
-        //                printf("[%d]=%ld ",i,sub_avgs[i]);
-        //            printf("Gathered\n");
                     pivot = median(nproc,sub_avgs);
                     free(sub_avgs);
                 }
         }
         else if ( rank2 == 0 && (medianPivot || meanPivot || randomPivot)){// Node 0 broadcasts its median key K to the rest of the cube.
             if (meanPivot  ){
-     //       printf("mean \n");
-
                 pivot = mean(size,c);
             }
             else if (medianPivot ){
-     //       printf("meadian \n");
                 pivot = median(size,c);
             }
             else if (randomPivot ){
-     //       printf("randomPivot \n");
             int randompiv = rand()%size ;
-     //       printf("randomindex %d \n",randompiv );
                 pivot = c[randompiv];
-      //      printf("Pivot %d \n", pivot);
             }
         }
         MPI_Bcast(&pivot,1,MPI_INT, 0, comm2);
+        PivotSelectionend = When();
+    CompareData = When();
+
         lowerSize = 0;
         upperSize = 0;
         for(i = 0; i < size; i++) {// Each node separates its items into two arrays : 
             if (c[i] <= pivot){//        keys <= K and 
                 alower[lowerSize] = c[i];
-          //  printf("lower [%d]=%d\n",i,alower[lowerSize]);
                 lowerSize ++;
             }
             else{//        keys > K
                 aupper[upperSize] = c[i];
-          //  printf("upper [%d]=%d\n",i,aupper[upperSize]);
                 upperSize ++;
             }
         }
-      //      printf("lowerSize %d\n",lowerSize);
-      //      printf("upperSize %d\n",upperSize);
+    CompareDataend = When();
 
+        Exchange = When();
 
         if (membershipKey == 0 ){ // lower world (left)
         MPI_Intercomm_create(comm2, 0, comm1, 1, 99, &intercomm);
 //    Each node in the lower subcube sends its items whose keys are > K to its adjacent node in the upper subcube
             MPI_Send(aupper, upperSize, MPI_INT, rank2, 0, intercomm ); 
-         //   printf("upperSize %ld ",upperSize);
-
-         //   printf("worldrank %d localrank %d sending upper\n ",rank, rank2);
-        //    for(i = 0; i < (upperSize); i++)
-         //       printf("[%d] = %ld ", i,aupper[i]);
-         //   printf("to otherrank %d \n ", rank2);
-              
               MPI_Probe(rank2, 0, intercomm, &status);
               MPI_Get_count(&status, MPI_INT, &number_amount);
               buf = (int*)malloc(sizeof(int) * number_amount);
@@ -203,71 +191,40 @@ int main(int argc, char *argv[])
             //    with the one it kept so that its items are one again sorted.
             free(c);
             c = ARRAY_CONCAT(int, alower, lowerSize, buf,number_amount);
-          //  printf("worldrank %d localrank %d gotsize %d\n",rank, rank2, number_amount);
             size = number_amount+lowerSize;
-
-     /*          for(i = 0; i < (number_amount); i++)
-                printf("[%d]=%ld ",i,buf[i]);
-            printf("\n ");
-            for(i = 0; i < size; i++)
-                printf("[%d]=%ld ",i,c[i]);
-
-            printf("\n "); */
         }else{
         MPI_Intercomm_create(comm2, 0, comm1, 0, 99, &intercomm);
-//    Each node in the upper subcube sends its items whose keys are <= K to its adjacent node in the lower subcube
+      //    Each node in the upper subcube sends its items whose keys are <= K to its adjacent node in the lower subcube
               MPI_Send(alower, lowerSize, MPI_INT, rank2, 0, intercomm ); 
-      //      printf("lowerSize %ld ",lowerSize);
-        //    printf("worldrank %d localrank %d sending lower\n ",rank, rank2);
-         //   for(i = 0; i < (lowerSize); i++)
-         //       printf("[%d]=%ld ",i,alower[i]);
-         //   printf("to otherrank %d \n ", rank2);
-
               MPI_Probe(rank2, 0, intercomm, &status); // dinamically recive
               MPI_Get_count(&status, MPI_INT, &number_amount);
               buf = (int*)malloc(sizeof(int) * number_amount);
               MPI_Recv(buf, number_amount, MPI_INT, rank2, 0, intercomm, &status);
               free(buf);
-
             //Each node now merges together the group it just received 
             //    with the one it kept so that its items are one again sorted.
             free(c);
             c = ARRAY_CONCAT(int, aupper, upperSize, buf,number_amount);
             size = number_amount+upperSize;
-
-       /*     printf("worldrank %d localrank %d gotsize %d\n",rank, rank2, number_amount);
-            for(i = 0; i < (number_amount); i++)
-                printf("[%d]=%ld ",i,buf[i]);
-            printf("\n ");
-            for(i = 0; i < size; i++)
-                printf("[%d]=%ld ",i,c[i]);
-            printf("\n "); */
         }
+        Exchangeend = When();
+
+        MyPortionSortTime = When();
         qsort(c, size, sizeof(int), cmpfunc); // Each node sorts the items it has using quicksort.
-
+        MyPortionSortTimeend = When();
         comm1 = comm2; 
-
+        MyPortion += MyPortionSortTimeend -MyPortionSortTime ;
+        PivotSel += PivotSelectionend  - PivotSelection ;
+        Exchan += Exchangeend - Exchange ;
+        CompareDa += CompareDataend - CompareData ;
     }
-    // not required for the lab
+    //   reduces answer not required for the lab
 
-  /*//dead, never was working , code....    
-    // Gather all partial sorts down to the root process
-    if (rank == 0) {
-          sub_avgs = malloc(sizeof(int) * nproc);
-    }
-    MPI_Gather(c, size, MPI_INT, sub_avgs, 2*VECSIZE, MPI_INT, 0, MPI_COMM_WORLD);
-
-    if (rank == 0) {
-        printf("sorteded array \n");
-        for(i = 0; i < size; i++)
-            printf("[%d]=%d ",i,sub_avgs[i]);
-        printf("\n");
-        free(sub_avgs);
-    }
-    */
     MPI_Finalize(); // does not pass till everyone else as made it there...
     if(rank == root) {
         double end = When();
         printf("Time %f\n",end-start);
+        printf("randomfill:%f MyPortionSortTime:%f  NumSteps:%f (PivotSelection:%f Exchange:%f CompareData:%f \n", randomfillend - randomfill, MyPortion/NumSteps , NumSteps ,PivotSel / NumSteps , Exchan / NumSteps , CompareDa / NumSteps );
+
     }
 }
