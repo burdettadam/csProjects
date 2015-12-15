@@ -17,7 +17,7 @@ export PBS_QUEUE=batch
 
 
 # LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
-mpicc -o lab6 mendels2Mpi.cpp  -O3
+mpic++ -o3 lab6 mendels2Mpi.cpp  -O3
 echo "2Th_lab6"
 mpirun -np 2 lab6
 echo "4Th_lab6"
