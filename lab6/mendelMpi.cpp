@@ -248,7 +248,6 @@ void slave(int range) // create image
 	            img[loc+0] = (unsigned char)(b);
 	        }
 	    }
-		result = 1 /* do the nonce */;
 		MPI_Send(img, imgSize, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD);
 		MPI_Send(&x, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
 		MPI_Send(&y, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);

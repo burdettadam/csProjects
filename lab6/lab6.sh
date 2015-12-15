@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --time=00:10:00   # walltime
-#SBATCH --nodes=24   # number of nodes
-#SBATCH --mem-per-cpu=2024M   # memory per CPU core
+#SBATCH --nodes=32   # number of nodes
+#SBATCH --mem-per-cpu=16384M   # memory per CPU core
 #SBATCH -J "lab6"   # job name
 #SBATCH --mail-user=burdettadam@gmail.com   # email address
 #SBATCH --mail-type=BEGIN
@@ -28,3 +28,5 @@ echo "16Th_lab6"
 mpirun -np 16 lab6
 echo "24Th_lab6"
 mpirun -np 24 lab6
+echo "32Th_lab6"
+mpirun -np 32 lab6
