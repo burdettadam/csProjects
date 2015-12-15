@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
 	MPI_Comm_size(
 	MPI_COMM_WORLD, &ntasks);          /* #processes in application */
 	//printf("WIDTH_HEIGHT : %d\n", WIDTH_HEIGHT);
-	range = WIDTH_HEIGHT / ( 4); 
+	range = WIDTH_HEIGHT / ( ntasks/2); 
 	//printf("range : %d \n", range);
 
 	if (myrank == 0) {
