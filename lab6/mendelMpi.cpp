@@ -263,11 +263,11 @@ int main(int argc, char *argv[])
 	MPI_Comm_size(
 	MPI_COMM_WORLD, &ntasks);          /* #processes in application */
 	//printf("WIDTH_HEIGHT : %d\n", WIDTH_HEIGHT);
-	if (ntasks == 2){ range = 7;}
-	else if (ntasks == 4){ range = 7;}
-	else if (ntasks == 8){ range = 7;}
-	else if (ntasks == 16){ range = 7;}
-	else if (ntasks == 32){ range = 7;}
+	if (ntasks == 2){ range = 5;}
+	else if (ntasks == 4){ range = 5;}
+	else if (ntasks == 8){ range = 5;}
+	else if (ntasks == 16){ range = 5;}
+	else if (ntasks == 32){ range = 5;}
 	range = WIDTH_HEIGHT / range; 
 	//printf("range : %d \n", range);
 
