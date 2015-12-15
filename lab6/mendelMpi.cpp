@@ -193,7 +193,7 @@ void master(int ntasks ,int  range )
 		//printf("sent die to : %d\n", rank);
 	}
     printf("time ran in  = %f\n",(When() - start) );
-    writeImage(image, WIDTH_HEIGHT, WIDTH_HEIGHT);
+  //  writeImage(image, WIDTH_HEIGHT, WIDTH_HEIGHT);
 	return;
 }
 
