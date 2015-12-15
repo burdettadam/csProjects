@@ -1,6 +1,7 @@
 #include <mpi.h> //http://www.hpc.cam.ac.uk/using-clusters/compiling-and-development/parallel-programming-mpi-example
 #include <sys/time.h>
 #include <math.h>
+#include <cstdlib>
 #define WORKTAG     1
 #define DIETAG     2
 ////////////////////////////////////////////////////////////////////////////////
