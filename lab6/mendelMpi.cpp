@@ -199,7 +199,6 @@ void master(int ntasks ,int  range )
 
 void slave(int range) // create image 
 {
-	double result=1;
 	State state;
 	int w = state.w;
     int h = state.h;
@@ -265,11 +264,12 @@ int main(int argc, char *argv[])
 	MPI_COMM_WORLD, &ntasks);          /* #processes in application */
 	//printf("WIDTH_HEIGHT : %d\n", WIDTH_HEIGHT);
 	if (ntasks == 2){ range = 2;}
-	else if (ntasks == 4){ range = 3;}
+	else if (ntasks == 4){ range = 4;}
 	else if (ntasks == 8){ range = 5;}
 	else if (ntasks == 16){ range = 8;}
-	else if (ntasks == 32){ range = 13;}
-	//printf("range : %d \n", range);
+	else if (ntasks == 32){ range = 14;}
+	range = WIDTH_HEIGHT / range; 
+	printf("range : %d \n", range);
 
 	if (myrank == 0) {
 		master(ntasks,range);
