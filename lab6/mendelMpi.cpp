@@ -265,6 +265,11 @@ int main(int argc, char *argv[])
 	MPI_COMM_WORLD, &ntasks);          /* #processes in application */
 	//printf("WIDTH_HEIGHT : %d\n", WIDTH_HEIGHT);
 	range = WIDTH_HEIGHT / ( (ntasks+2)/2); 
+	if (ntasks == 2) range = 2;
+	if (ntasks == 4) range = 3;
+	if (ntasks == 8) range = 5;
+	if (ntasks == 16) range = 8;
+	if (ntasks == 32) range = 13;
 	//printf("range : %d \n", range);
 
 	if (myrank == 0) {
