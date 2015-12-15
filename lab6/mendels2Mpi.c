@@ -1,17 +1,23 @@
 #include <mpi.h> //http://www.hpc.cam.ac.uk/using-clusters/compiling-and-development/parallel-programming-mpi-example
 #include <sys/time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <curses.h>
 #include <math.h>
-#include <cstdlib>
 #define WORKTAG     1
 #define DIETAG     2
+#define ZOOM  6800
+#define MAX_ITERATIONS  100
 ////////////////////////////////////////////////////////////////////////////////
 static const int WIDTH_HEIGHT = 28000;
 static const int HUE_PER_ITERATION = 5;
 static const bool DRAW_ON_KEY = true;
 unsigned char *image = NULL;
+static const float CENTERX = -1.186340599860225;
+static const float CENTERY = -0.303652988644423;
 ////////////////////////////////////////////////////////////////////////////////
 
-class State {
+/*class State {
     public:
         double centerX;
         double centerY;
@@ -40,6 +46,9 @@ class State {
             maxIterations += i;
         }
 };
+*/
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /* Return the correct time in seconds, using a double precision number.       */
@@ -119,7 +128,7 @@ void master(int ntasks ,int  range )
 	MPI_Status     status;
     double imgSize = (3*(long long)WIDTH_HEIGHT*(long long)WIDTH_HEIGHT);
 	if (img) free(img);
-    img = (unsigned char *)malloc(imgSize);
+    img = (unsigned char *) malloc(imgSize);
 /*
 * Seed the slaves.
 */
@@ -198,9 +207,8 @@ void master(int ntasks ,int  range )
 void slave(int range) // create image 
 {
 	double result=1;
-	State state;
-	int w = state.w;
-    int h = state.h;
+	int w = WIDTH_HEIGHT;
+    int h = WIDTH_HEIGHT;
     int x,y;
     if (w > WIDTH_HEIGHT) w = WIDTH_HEIGHT;
     if (h > WIDTH_HEIGHT) h = WIDTH_HEIGHT;
@@ -223,17 +231,17 @@ void slave(int range) // create image
 		}
 		//int diff = (iproc * range);
 		for (int px =x; px < x + range ; px++) {
-        	xs[px] = (px - w/2)/state.zoom + state.centerX;
+        	xs[px] = (px - w/2)/ZOOM + CENTERX;
     	}
     	for (int py =y; py < y + range ; py++) {
-        	ys[py] = (py - h/2)/state.zoom + state.centerY;
+        	ys[py] = (py - h/2)/ZOOM + CENTERY;
     	}
 
 	    for (int px=x; px< x + range; px++) {
 	        for (int py=y; py< y + range; py++) {
 			//	printf("x: %d, y: %d\n", px , py );
 	            r = g = b = 0;
-	            float iterations = iterationsToEscape(xs[px], ys[py], state.maxIterations);
+	            float iterations = iterationsToEscape(xs[px], ys[py], MAX_ITERATIONS);
 	            if (iterations != -1) {
 	                float h = HUE_PER_ITERATION * iterations;
 	                r = hue2rgb(h + 120);
