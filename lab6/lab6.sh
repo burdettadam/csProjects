@@ -26,7 +26,5 @@ echo "8Th_lab6"
 mpirun -np 8 lab6
 echo "16Th_lab6"
 mpirun -np 16 lab6
-echo "24Th_lab6"
-mpirun -np 24 lab6
 echo "32Th_lab6"
 mpirun -np 32 lab6
