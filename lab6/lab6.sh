@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --time=00:10:00   # walltime
+#SBATCH --time=00:15:00   # walltime
 #SBATCH --nodes=32   # number of nodes
 #SBATCH --mem-per-cpu=16384M   # memory per CPU core
 #SBATCH -J "lab6"   # job name
@@ -18,9 +18,13 @@ export PBS_QUEUE=batch
 
 # LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
 mpic++ -O  mendelMpi.cpp -o lab6
-
+echo "2Th_lab6"
+mpirun -np 2 lab6
 echo "4Th_lab6"
 mpirun -np 4 lab6
-
+echo "8Th_lab6"
+mpirun -np 8 lab6
+echo "16Th_lab6"
+mpirun -np 16 lab6
 echo "32Th_lab6"
 mpirun -np 32 lab6
