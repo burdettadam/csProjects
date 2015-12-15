@@ -1,10 +1,6 @@
 #include <mpi.h> //http://www.hpc.cam.ac.uk/using-clusters/compiling-and-development/parallel-programming-mpi-example
-#include <openssl/sha.h>
-#include <stdio.h>
-#include <string.h>
 #include <sys/time.h>
 #include <math.h>
-#include <stdlib.h>
 #define WORKTAG     1
 #define DIETAG     2
 ////////////////////////////////////////////////////////////////////////////////
