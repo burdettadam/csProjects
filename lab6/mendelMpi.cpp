@@ -1,4 +1,4 @@
-#include <mpi.h> //http://www.hpc.cam.ac.uk/using-clusters/compiling-and-development/parallel-programming-mpi-example
+#include <mpi.h> 
 #include <openssl/sha.h>
 #include <stdio.h>
 #include <string.h>
@@ -82,7 +82,6 @@ int hue2rgb(float t){
 
 void writeImage(unsigned char *img, int w, int h) {
     long long filesize = 54 + 3*(long long)w*(long long)h;
-    //int filesize = 54 + 3*w*h;
     unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0};
     unsigned char bmpinfoheader[40] = {40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0, 24,0};
     unsigned char bmppad[3] = {0,0,0};
@@ -106,7 +105,6 @@ void writeImage(unsigned char *img, int w, int h) {
     fwrite(bmpfileheader,1,14,f);
     fwrite(bmpinfoheader,1,40,f);
     for (int i=0; i<h; i++) {
-        //fwrite(img+(w*(h-i-1)*3),3,w,f);
         long long offset = ((long long)w*(h-i-1)*3);
         fwrite(img+offset,3,w,f);
         fwrite(bmppad,1,(4-(w*3)%4)%4,f);
@@ -142,7 +140,6 @@ void master(int ntasks ,int  range )
 * Receive a result from any slave and dispatch a new nonce
 * request nonce requests have been exhausted.
 */
- 	//nonce += range; /* get_next_nonce_request */ // I dont think we need this
 	double start = When();
 	while (y < WIDTH_HEIGHT) {       /* valid new work request */
 		MPI_Recv(img, imgSize, MPI_UNSIGNED_CHAR, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);       /* received message info */
@@ -151,6 +148,7 @@ void master(int ntasks ,int  range )
 
 		MPI_Send(&x, 1, MPI_INT, status.MPI_SOURCE, WORKTAG, MPI_COMM_WORLD);
 		MPI_Send(&y, 1, MPI_INT, status.MPI_SOURCE, WORKTAG, MPI_COMM_WORLD);
+		// bottle neck for larger clusters....
 	    for (int px=rx; px< rx + range; px++) {
 	        for (int py=ry; py< ry + range; py++) {
 	            long long  loc = ((long long)px+(long long)py*(long long)WIDTH_HEIGHT)*3;
@@ -159,8 +157,6 @@ void master(int ntasks ,int  range )
 	            image[loc+0] = img[loc+0] ;
 	        }
 	    }
-
-
 		x += range; /* get next work block */
 		if(x == WIDTH_HEIGHT ){ 
 			y += range;
@@ -174,6 +170,7 @@ void master(int ntasks ,int  range )
 		MPI_Recv(img, imgSize, MPI_UNSIGNED_CHAR, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);       /* received message info */
 		MPI_Recv(&rx, 1, MPI_INT, status.MPI_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 		MPI_Recv(&ry, 1, MPI_INT, status.MPI_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+		// bottle neck for larger clusters, this forces it to be sqencial at the end.
 		for (int px=rx; px< rx + range; px++) {
 	        for (int py=ry; py< ry + range; py++) {
 	            long long  loc = ((long long)px+(long long)py*(long long)WIDTH_HEIGHT)*3;
@@ -189,8 +186,6 @@ void master(int ntasks ,int  range )
 	for (rank = 1; rank < ntasks; ++rank) {
 		MPI_Send(0, 0, MPI_INT, rank, DIETAG, MPI_COMM_WORLD);
 		MPI_Send(0, 0, MPI_INT, rank, DIETAG, MPI_COMM_WORLD);
-
-		//printf("sent die to : %d\n", rank);
 	}
     printf("time ran in  = %f\n",(When() - start) );
   //  writeImage(image, WIDTH_HEIGHT, WIDTH_HEIGHT);
@@ -218,11 +213,10 @@ void slave(int range) // create image
 		MPI_Recv(&y, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 /*
 * Check the tag of the received message.
-*/		//printf("x: %d, y: %d\n", x , y );
+*/		
 		if (status.MPI_TAG == DIETAG) {
 			return;
 		}
-		//int diff = (iproc * range);
 		for (int px =x; px < x + range ; px++) {
         	xs[px] = (px - w/2)/state.zoom + state.centerX;
     	}
@@ -232,7 +226,6 @@ void slave(int range) // create image
 
 	    for (int px=x; px< x + range; px++) {
 	        for (int py=y; py< y + range; py++) {
-			//	printf("x: %d, y: %d\n", px , py );
 	            r = g = b = 0;
 	            float iterations = iterationsToEscape(xs[px], ys[py], state.maxIterations);
 	            if (iterations != -1) {
@@ -254,23 +247,18 @@ void slave(int range) // create image
 }
 int main(int argc, char *argv[])
 {
-
-
 	int myrank;
 	MPI_Init(&argc, &argv);   /* initialize MPI */
 	MPI_Comm_rank(MPI_COMM_WORLD , &myrank);      /* process rank, 0 thru N-1 */
 	int	ntasks, range;
 	MPI_Comm_size(
 	MPI_COMM_WORLD, &ntasks);          /* #processes in application */
-	//printf("WIDTH_HEIGHT : %d\n", WIDTH_HEIGHT);
 	if (ntasks == 2){ range = 5;}
 	else if (ntasks == 4){ range = 5;}
 	else if (ntasks == 8){ range = 5;}
 	else if (ntasks == 16){ range = 8;}
 	else if (ntasks == 32){ range = 10;}
 	range = WIDTH_HEIGHT / range; 
-	//printf("range : %d \n", range);
-
 	if (myrank == 0) {
 		master(ntasks,range);
 	} else {

@@ -1,0 +1,38 @@
+2Th_lab6
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 15785 on node m7-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+4Th_lab6
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 15818 on node m7-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+8Th_lab6
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 15930 on node m7-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+16Th_lab6
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 16009 on node m7-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+24Th_lab6
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 16478 on node m7-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+32Th_lab6
+slurmstepd: *** JOB 8999485 ON m7-1-6 CANCELLED AT 2015-12-14T22:58:12 DUE TO TIME LIMIT ***
+slurmstepd: Exceeded step memory limit at some point.
+slurmstepd: Exceeded job memory limit at some point.
+[m7-1-6:17043] [[16721,0],0]->[[16721,0],64] mca_oob_tcp_msg_send_bytes: write failed: Broken pipe (32) [sd = 157]
+[m7-1-6:17043] [[16721,0],0]-[[16721,0],64] mca_oob_tcp_peer_send_handler: unable to send header
+[m7-1-6:17043] [[16721,0],0]->[[16721,0],32] mca_oob_tcp_msg_send_bytes: write failed: Broken pipe (32) [sd = 161]
+[m7-1-6:17043] [[16721,0],0]-[[16721,0],32] mca_oob_tcp_peer_send_handler: unable to send header
+[m7-1-6:17043] [[16721,0],0]->[[16721,0],16] mca_oob_tcp_msg_send_bytes: write failed: Broken pipe (32) [sd = 18]
+[m7-1-6:17043] [[16721,0],0]-[[16721,0],16] mca_oob_tcp_peer_send_handler: unable to send header
+[m7-1-6:17043] [[16721,0],0]->[[16721,0],8] mca_oob_tcp_msg_send_bytes: write failed: Broken pipe (32) [sd = 19]
+[m7-1-6:17043] [[16721,0],0]-[[16721,0],8] mca_oob_tcp_peer_send_handler: unable to send header
+[m7-1-6:17043] [[16721,0],0]->[[16721,0],2] mca_oob_tcp_msg_send_bytes: write failed: Broken pipe (32) [sd = 23]
+[m7-1-6:17043] [[16721,0],0]-[[16721,0],2] mca_oob_tcp_peer_send_handler: unable to send header
+[m7-1-6:17043] [[16721,0],0]->[[16721,0],1] mca_oob_tcp_msg_send_bytes: write failed: Broken pipe (32) [sd = 29]
+[m7-1-6:17043] [[16721,0],0]-[[16721,0],1] mca_oob_tcp_peer_send_handler: unable to send header
+[m7-1-6:17043] [[16721,0],0]->[[16721,0],4] mca_oob_tcp_msg_send_bytes: write failed: Broken pipe (32) [sd = 110]
+[m7-1-6:17043] [[16721,0],0]-[[16721,0],4] mca_oob_tcp_peer_send_handler: unable to send header

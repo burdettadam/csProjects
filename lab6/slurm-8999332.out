@@ -1,0 +1,24 @@
+g++: error: mendels2Mpi.cpp: No such file or directory
+2Th_lab6
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 15334 on node m7-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+4Th_lab6
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 15404 on node m7-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+8Th_lab6
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 15430 on node m7-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+16Th_lab6
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 15465 on node m7-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+24Th_lab6
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 15844 on node m7-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+32Th_lab6
+slurmstepd: *** JOB 8999332 ON m7-1-6 CANCELLED AT 2015-12-14T22:57:12 DUE TO TIME LIMIT ***
+slurmstepd: Exceeded step memory limit at some point.

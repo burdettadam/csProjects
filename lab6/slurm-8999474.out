@@ -1,0 +1,28 @@
+2Th_lab6
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 79521 on node m8-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+4Th_lab6
+[m8-3-5][[63241,1],2][btl_tcp_frag.c:233:mca_btl_tcp_frag_recv] mca_btl_tcp_frag_recv: readv failed: Connection reset by peer (104)
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 79620 on node m8-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+8Th_lab6
+[m8-2-3][[63178,1],1][btl_tcp_frag.c:233:mca_btl_tcp_frag_recv] mca_btl_tcp_frag_recv: readv failed: Connection reset by peer (104)
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 79684 on node m8-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+16Th_lab6
+[m8-10-9][[63128,1],8][btl_tcp_frag.c:233:mca_btl_tcp_frag_recv] mca_btl_tcp_frag_recv: readv failed: Connection reset by peer (104)
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 79988 on node m8-1-6 exited on signal 9 (Killed).
+--------------------------------------------------------------------------
+24Th_lab6
+slurmstepd: *** JOB 8999474 ON m8-1-6 CANCELLED AT 2015-12-14T22:29:53 DUE TO TIME LIMIT ***
+[m8-1-6:80521] [[64334,0],0]->[[64334,0],2] mca_oob_tcp_msg_send_bytes: write failed: Broken pipe (32) [sd = 19]
+[m8-1-6:80521] [[64334,0],0]-[[64334,0],2] mca_oob_tcp_peer_send_handler: unable to send header
+[m8-1-6:80521] [[64334,0],0]->[[64334,0],4] mca_oob_tcp_msg_send_bytes: write failed: Broken pipe (32) [sd = 24]
+[m8-1-6:80521] [[64334,0],0]-[[64334,0],4] mca_oob_tcp_peer_send_handler: unable to send header
+[m8-1-6:80521] [[64334,0],0]->[[64334,0],1] mca_oob_tcp_msg_send_bytes: write failed: Broken pipe (32) [sd = 35]
+[m8-1-6:80521] [[64334,0],0]-[[64334,0],1] mca_oob_tcp_peer_send_handler: unable to send header
+slurmstepd: Exceeded step memory limit at some point.
