@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-const int tableSize = 8192;
+const int tableSize = 2048;
 const int blocksize = 1024;
 
 __global__ void kernel(int *array)
