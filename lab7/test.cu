@@ -30,8 +30,8 @@ int main() {
     size_t pitch;
     cudaMallocPitch(&device_matrix, &pitch, col * sizeof(float), row);
     dim3 block;
-    block.x = row;
-    block.y = col;
+    block.x = (1024/2);
+    block.y = (1024/2);
     dim3 grid;
     grid.x = row / block.x;
     grid.y = col / block.y;
