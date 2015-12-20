@@ -24,7 +24,7 @@ void Compute();
 
 int main(int argc, char *argv[])
 {
-	double t0, tottime;
+	double start;
 	ncols = TOTCOLS;
 	nrows = TOTROWS;
 
@@ -34,12 +34,11 @@ int main(int argc, char *argv[])
 	cudaMalloc((void **) &fixed,  nrows * ncols * sizeof(float));
 	fprintf(stderr,"Memory allocated\n");
 
-	t0 = When();
+	start = When();
 	/* Now proceed with the Jacobi algorithm */
 	Compute();
 
-	tottime = When() - t0;
-	printf("Total Time is: %lf sec.\n", tottime);
+	printf("Total Time is: %lf sec.\n", (When() - start));
 
 	return 0;
 }
@@ -47,42 +46,162 @@ int main(int argc, char *argv[])
 __global__ void InitArrays(float *ip, float *op, float *fp, int *kp, int ncols)
 {
 	int i;
-	float *fppos, *oppos, *ippos;
-        int *kppos;
-        int blockOffset;
-        int rowStartPos;
-        int colsPerThread;
-	
+	// ncols is the same as number of threads
         // Each block gets a row, each thread will fill part of a row
-
 	// Calculate the offset of the row
-        blockOffset = blockIdx.x * ncols;
-        // Calculate our offset into the row
-	rowStartPos = threadIdx.x * (ncols/blockDim.x);
+    int blockOffset = blockIdx.x * ncols; // first possion in array of the block3
         // The number of cols per thread
-        colsPerThread = ncols/blockDim.x;
-
-	ippos = ip + blockOffset+ rowStartPos;
-	fppos = fp + blockOffset+ rowStartPos;
-	oppos = op + blockOffset+ rowStartPos;
-	kppos = kp + blockOffset+ rowStartPos;
+    int colsPerThread = ncols/blockDim.x;
+        // Calculate our offset into the row for the thread
+	int colStartPos = threadIdx.x * (colsPerThread); // col index 
+	// position = arrayaddress + position of block + position of thread
+	//int col = threadIdx.x + blockIdx.x * colsPerThread ;//* blockDim.x // I thick this is correct..
+	int col = colStartPos;
+	int row = blockIdx.x ;
+	float *ippos = ip + blockOffset+ colStartPos;
+	float *fppos = fp + blockOffset+ colStartPos;
+	float *oppos = op + blockOffset+ colStartPos;
+	int *kppos = kp + blockOffset+ colStartPos;
 
 	for (i = 0; i < colsPerThread; i++) {
 		fppos[i] = NOTSETLOC; // Not Fixed
 		ippos[i] = 50;
 		oppos[i] = 50;
-	        kppos[i] = 1; // Keep Going
+	    kppos[i] = 1; // Keep Going
 	}
-        // Insert code to set the rest of the boundary and fixed positions
+        // set the rest of the boundary and fixed positions
+	for (i = 0; i < colsPerThread; i++) {
+		col += i;
+        if (row == 0 || col == 0 || col == ncols-1 ){
+            ippos[i] = 0.0;
+            oppos[i] = 0.0;
+        }
+        else if (row == (TOTCOLS - 1) ){
+            ippos[i] = 100.0;
+            oppos[i] = 100.0;
+        }
+	}
+	if (row == 400 ){
+		col = colStartPos;
+	    for ( i = 0; i < colsPerThread; i++) {
+			col += i;
+	    	if (col < 331){
+		        ippos[i]=100.0;
+		        oppos[i]=100.0;
+		    }else{
+		    	break;
+		    }
+	    }
+
+	}
+	else if (row == 200){
+		col = colStartPos;
+		if ( col <= 500 && (col + ncols) >= 500 ){
+			ippos[500]=100.0;
+	    	oppos[500]=100.0;	
+		}
+		
+	}
 }
 __global__ void doCalc(float *iplate, float *oplate, int ncols)
-{
-	/* Compute the 5 point stencil for my region */
+{//This is called non-uniform indexing
+	/* Compute the 5 point stencil for my region *///??????????????
+	int i;
+	// ncols is the same as number of threads
+        // Each block gets a row, each thread will fill part of a row
+	// Calculate the offset of the row
+    int blockOffset = blockIdx.x * ncols; // first possion in array of the block3
+        // The number of cols per thread
+    int colsPerThread = ncols/blockDim.x;
+        // Calculate our offset into the row for the thread
+	int colStartPos = threadIdx.x * (colsPerThread); // col index 
+	// position = arrayaddress + position of block + position of thread
+	//int col = threadIdx.x + blockIdx.x * colsPerThread ;//* blockDim.x // I thick this is correct..
+	int col = colStartPos;
+	int row = blockIdx.x ;
+	int rowup,rowdown;
+	if(blockIdx.x == 0){
+		rowup = 0;
+	}else{
+		rowup = blockIdx.x - 1 ;
+	}
+	if(blockIdx.x == ncols-1){
+		return;
+	}
+	rowdown = blockIdx.x + 1;
+
+	float *ippos = iplate + blockOffset+ colStartPos;
+	float *oppos = oplate + blockOffset+ colStartPos;
+	for (i = 0; i < colsPerThread; i++) {
+		col += i;
+		if (col == 0 || col == ncols){
+			continue;
+		}else{
+ 			ippos[i] =(( oppos[rowdown][col]//bottom
+                             + oppos[rowup[col]//top
+                             + oppos[row][col+1]//right
+                             + oppos[row][col-1])//left
+                            + (4.0 * oppos[row][col])) / 8.0;
+		}
+  	}
+    if (row == 400 ){
+		col = colStartPos;
+	    for ( i = 0; i < colsPerThread; i++) {
+			col += i;
+	    	if (col < 331){
+		        ippos[i]=100.0;
+		        oppos[i]=100.0;
+		    }else{
+		    	break;
+		    }
+	    }
+
+	}
+	else if (row == 200){
+		col = colStartPos;
+		if ( col <= 500 && (col + ncols) >= 500 ){
+			ippos[500]=100.0;
+    		oppos[500]=100.0;
+		}
+
+	}
 }
 
 __global__ void doCheck(float *iplate, float *oplate, float *fixed, int *lkeepgoing, int ncols)
 {
 	// Calculate keepgoing array
+		int i,col;
+	// ncols is the same as number of threads
+        // Each block gets a row, each thread will fill part of a row
+	// Calculate the offset of the row
+    int blockOffset = blockIdx.x * ncols; // first possion in array of the block3
+        // The number of cols per thread
+    int colsPerThread = ncols/blockDim.x;
+        // Calculate our offset into the row for the thread
+	int colStartPos = threadIdx.x * (colsPerThread); // col index 
+	// position = arrayaddress + position of block + position of thread
+	//int col = threadIdx.x + blockIdx.x * colsPerThread ;//* blockDim.x // I thick this is correct..
+	int col = colStartPos;
+	int row = blockIdx.x ;
+	float *ippos = iplate + blockOffset+ colStartPos;
+	float *fppos = fixed + blockOffset+ colStartPos;
+	float *oppos = oplate + blockOffset+ colStartPos;
+	int kppos = lkeepgoing + blockOffset+ colStartPos;
+	float delta = 0.0;
+    float averageNabor =0.0;
+    for (i = 0; i < colsPerThread; i++) {
+		col += i;
+		if (col == 0 || col == ncols){
+			continue;
+		}else{
+		    delta = fabs((ippos[col] - oppos[col]));
+            if (delta > 0.0500) {
+                kppos[col] = 1; // keep going
+            }else{
+            	kppos[col] = 0; // steady state
+            }
+        }
+	}
 }
 
 __global__ void reduceSingle(int *idata, int *single, int nrows)
@@ -183,7 +302,10 @@ void Compute()
 		doCalc<<< nrows, blocksize >>>(iplate, oplate, ncols);
 		doCheck<<< nrows, blocksize >>>(iplate, oplate, fixed, lkeepgoing, ncols);
 		reduceSum<<< nrows, blocksize>>>(lkeepgoing, keepgoing_sums, ncols);
-//		cudaMemcpy(peek, keepgoing_sums, nrows*sizeof(int), cudaMemcpyDeviceToHost);
+		//reduce1<<<nrows, blocksize>>>((lkeepgoing, keepgoing_sums, ncols));
+		//reduce2<<<nrows, blocksize>>>((lkeepgoing, keepgoing_sums, ncols));
+		//reduce3<<<nrows, blocksize>>>((lkeepgoing, keepgoing_sums, ncols));
+		cudaMemcpy(peek, keepgoing_sums, nrows*sizeof(int), cudaMemcpyDeviceToHost);
 //		fprintf(stderr, "after cudaMemcpy \n");
 //		int i;
  //		for(i = 0; i < nrows; i++) {
@@ -212,7 +334,64 @@ void Compute()
 	cudaFree(keepgoing_sums);
 	fprintf(stderr,"Finished in %d iterations\n", iteration);
 }
-
+__global__ void reduce1(int *g_idata, int *g_odata,int nrows) {
+	extern __shared__ int sdata[];
+	// each thread loads one element from global to shared mem
+	unsigned int tid = threadIdx.x;
+	int rowStartPos = threadIdx.x * (nrows/blockDim.x);
+    int colsPerThread = nrows/blockDim.x;
+	unsigned int i = blockIdx.x*colsPerThread + threadIdx.x;
+	sdata[tid] = g_idata[i];
+	__syncthreads();
+	// do reduction in shared mem
+	for(unsigned int s=1; s < colsPerThread; s *= 2) {
+		if (tid % (2*s) == 0) {
+		sdata[tid] += sdata[tid + s];
+		}
+		__syncthreads();
+	}
+	// write result for this block to global mem
+	if (tid == 0) g_odata[blockIdx.x] = sdata[0];
+}
+__global__ void reduce2(int *g_idata, int *g_odata,int nrows) {
+	extern __shared__ int sdata[];
+	// each thread loads one element from global to shared mem
+	unsigned int tid = threadIdx.x;
+	int rowStartPos = threadIdx.x * (nrows/blockDim.x);
+    int colsPerThread = nrows/blockDim.x;
+	unsigned int i = blockIdx.x*colsPerThread + threadIdx.x;
+	sdata[tid] = g_idata[i];
+	__syncthreads();
+	// do reduction in shared mem
+	for(unsigned int s=1; s < colsPerThread; s *= 2) {
+		int index = 2 * s * tid;
+		if (index < colsPerThread) {
+			sdata[index] += sdata[index + s];
+		}
+		__syncthreads();
+	}
+	// write result for this block to global mem
+	if (tid == 0) g_odata[blockIdx.x] = sdata[0];
+}
+__global__ void reduce3(int *g_idata, int *g_odata,int nrows) {
+	extern __shared__ int sdata[];
+	// each thread loads one element from global to shared mem
+	unsigned int tid = threadIdx.x;
+	int rowStartPos = threadIdx.x * (nrows/blockDim.x);
+    int colsPerThread = nrows/blockDim.x;
+	unsigned int i = blockIdx.x*colsPerThread + threadIdx.x;
+	sdata[tid] = g_idata[i];
+	__syncthreads();
+	// do reduction in shared mem
+	for (unsigned int s=colsPerThread/2; s>0; s>>=1) {
+		if (tid < s) {
+			sdata[tid] += sdata[tid + s];
+		}
+		__syncthreads();
+	}
+	// write result for this block to global mem
+	if (tid == 0) g_odata[blockIdx.x] = sdata[0];
+}
 /* Return the current time in seconds, using a double precision number.       */
 double When()
 {
