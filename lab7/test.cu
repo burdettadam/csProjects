@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <assert.h>
-#define row 11
-#define col 11
+#define row 8192
+#define col 8192
+const int blocksize = 1024;
+
 __global__ void kernel(float * device_matrix, size_t pitch) {
     for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < row; j += blockDim.y * gridDim.y) {
         float* row_device_matrix = (float*)((char*)device_matrix + j*pitch);
@@ -31,8 +33,8 @@ int main() {
     size_t pitch;
     cudaMallocPitch(&device_matrix, &pitch, col * sizeof(float), row);
     dim3 block;
-    block.x = row;
-    block.y = col;
+    block.x = blocksize/2;
+    block.y = blocksize/2;
     dim3 grid;
     grid.x = row / block.x;
     grid.y = col / block.y;
