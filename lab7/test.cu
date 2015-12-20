@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
-#define row 510
-#define col 510
+#define row 11
+#define col 11
 __global__ void kernel(float * device_matrix, size_t pitch) {
     for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < row; j += blockDim.y * gridDim.y) {
         float* row_device_matrix = (float*)((char*)device_matrix + j*pitch);
@@ -12,6 +12,7 @@ __global__ void kernel(float * device_matrix, size_t pitch) {
 }
 void verify(float *h, float *d, int size) {
     for (int i = 0; i < size; i++) {
+        printf("%2d ",d[i]);
         assert(h[i] == d[i]);
     }
     printf("Results match\n");
