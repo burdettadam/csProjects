@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-const int tableSize = 16;
+const int tableSize = 8192;
 
 __global__ void kernel(int *array)
 {
@@ -22,7 +22,45 @@ __global__ void kernel(int *array)
 
   // write out the result
  // array[index] = result;
-  array[index] = index_x + (index_y * tableSize); // shoult print out index of each cell.
+  array[index] = index_x + (index_y * tableSize); // should print out index of each cell.
+                                                 //                         N 
+  int C = index_x + index_y*tableSize;           // node (i,j)              |
+  int N = index_x + (index_y+1)*tableSize;       // node (i,j+1)            |
+  int S = index_x + (index_y-1)*tableSize;       // node (i,j-1)     W ---- C ---- E
+  int E = (index_x+1) + index_y*tableSize;       // node (i+1,j)            |
+  int W = (index_x-1) + index_y*tableSize;       //                         |
+                                                 //                         S 
+
+}
+__global__ void fillPlateWithTemperature( int *current,int *old)
+{
+  int index_x = blockIdx.x * blockDim.x + threadIdx.x;
+  int index_y = blockIdx.y * blockDim.y + threadIdx.y;
+  int grid_width = gridDim.x * blockDim.x;
+  int index = index_y * grid_width + index_x;
+
+    for (int row = 0 ; row < tableSize; row++ ) {
+        for (int col = 0 ; col < tableSize; col++) {
+            // the checks will slow you down alot....
+            if (row == 0 || col == 0 || col == tableSize-1 ){
+                current[row][col] = 0.0;
+                old[row][col] = 0.0;
+            }
+            else if (row == (tableSize - 1) ){
+                current[row][col] = 100.0;
+                old[row][col] = 100.0;
+            }
+        }
+    }
+    for (int col = 0; col < 331 ; col++) {
+        current[400][col]=100.0;
+        old[400][col]=100.0;
+    }
+    current[200][500]=100.0;
+    old[200][500]=100.0;
+
+
+    
 }
 
 
@@ -54,8 +92,8 @@ int main(void)
 
   // create 4x4 thread blocks
   dim3 block_size;
-  block_size.x = 4;
-  block_size.y = 4;
+  block_size.x = tableSize/4;
+  block_size.y = tableSize/4;
 
   // configure a two dimensional grid as well
   dim3 grid_size;
