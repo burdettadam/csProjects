@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
-#define row 8192
-#define col 8192
-const int blocksize = 1024;
-
+#define row 11
+#define col 11
 __global__ void kernel(float * device_matrix, size_t pitch) {
     for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < row; j += blockDim.y * gridDim.y) {
         float* row_device_matrix = (float*)((char*)device_matrix + j*pitch);
@@ -14,10 +12,9 @@ __global__ void kernel(float * device_matrix, size_t pitch) {
 }
 void verify(float *h, float *d, int size) {
     for (int i = 0; i < size; i++) {
-       // assert(h[i] == d[i]);
-        printf("%2s\n",h[i]);
+        assert(h[i] == d[i]);
     }
-    //printf("Results match\n");
+    printf("Results match\n");
 }
 int main() {
     float *host_matrix;
@@ -28,19 +25,21 @@ int main() {
     for (int j = 0; j < row; j++) {
         for (int i = 0; i < col; i++) {
             host_matrix[j * col + i] = (j * col + i) + (j * col + i);
-            //printf("%2d ",host_matrix)
+            printf("%2d ",host_matrix)
         }
     }
     size_t pitch;
     cudaMallocPitch(&device_matrix, &pitch, col * sizeof(float), row);
     dim3 block;
-    block.x = blocksize/2;
-    block.y = blocksize/2;
+    block.x = row;
+    block.y = col;
     dim3 grid;
-    grid.x = row / block.x;
-    grid.y = col / block.y;
+    grid_size.x = row / block.x;
+    grid_size.y = col / block.y;
     kernel<<<grid, block>>>(device_matrix, pitch);
     cudaMemcpy2D(deviceCopy_matrix, col * sizeof(float), device_matrix, pitch, col * sizeof(float), row, cudaMemcpyDeviceToHost);
     verify(host_matrix, deviceCopy_matrix, col * row);
-    free(host_matrix); cudaFree(device_matrix); free(deviceCopy_matrix);
+    free(host_matrix);
+    cudaFree(device_matrix);
+    free(deviceCopy_matrix);
 }
