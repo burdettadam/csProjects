@@ -25,7 +25,6 @@ int main() {
     for (int j = 0; j < row; j++) {
         for (int i = 0; i < col; i++) {
             host_matrix[j * col + i] = (j * col + i) + (j * col + i);
-            printf("%2d ",host_matrix)
         }
     }
     size_t pitch;
@@ -34,8 +33,8 @@ int main() {
     block.x = row;
     block.y = col;
     dim3 grid;
-    grid_size.x = row / block.x;
-    grid_size.y = col / block.y;
+    grid.x = row / block.x;
+    grid.y = col / block.y;
     kernel<<<grid, block>>>(device_matrix, pitch);
     cudaMemcpy2D(deviceCopy_matrix, col * sizeof(float), device_matrix, pitch, col * sizeof(float), row, cudaMemcpyDeviceToHost);
     verify(host_matrix, deviceCopy_matrix, col * row);
