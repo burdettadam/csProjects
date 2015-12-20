@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
-#define row 11
-#define col 11
+#define row 22
+#define col 22
 __global__ void kernel(float * device_matrix, size_t pitch) {
     for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < row; j += blockDim.y * gridDim.y) {
         float* row_device_matrix = (float*)((char*)device_matrix + j*pitch);
