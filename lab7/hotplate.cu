@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-const int tableSize = 1024;
+const int tableSize = 8192;
 const int blocksize = 1024;
 
 __global__ void kernel(int *array)
@@ -92,7 +92,7 @@ int main(void)
   // choose a two dimensional launch configuration
   // use the dim3 type when launches are not one dimensional
 
-  // create 4x4 thread blocks
+  // create 512x512 thread blocks
   dim3 block_size;
   block_size.x = blocksize/2;
   block_size.y = blocksize/2;
