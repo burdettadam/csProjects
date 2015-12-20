@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 const int tableSize = 8192;
+const int blocksize = 1024;
 
 __global__ void kernel(int *array)
 {
@@ -93,8 +94,8 @@ int main(void)
 
   // create 4x4 thread blocks
   dim3 block_size;
-  block_size.x = tableSize/4;
-  block_size.y = tableSize/4;
+  block_size.x = blocksize;
+  block_size.y = blocksize;
 
   // configure a two dimensional grid as well
   dim3 grid_size;
