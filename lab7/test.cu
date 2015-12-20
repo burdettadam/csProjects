@@ -14,9 +14,10 @@ __global__ void kernel(float * device_matrix, size_t pitch) {
 }
 void verify(float *h, float *d, int size) {
     for (int i = 0; i < size; i++) {
-        assert(h[i] == d[i]);
+       // assert(h[i] == d[i]);
+        printf("%2s\n",h[i]);
     }
-    printf("Results match\n");
+    //printf("Results match\n");
 }
 int main() {
     float *host_matrix;
