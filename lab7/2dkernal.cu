@@ -24,14 +24,15 @@ __global__ void kernel(int *array)
  // array[index] = result;
   array[index] = index_x + (index_y * tableSize); // should print out index of each cell.
                                                  //                         N 
-  int C = index_x + index_y*tableSize;           // node (i,j)              |
-  int N = index_x + (index_y+1)*tableSize;       // node (i,j+1)            |
-  int S = index_x + (index_y-1)*tableSize;       // node (i,j-1)     W ---- C ---- E
-  int E = (index_x+1) + index_y*tableSize;       // node (i+1,j)            |
-  int W = (index_x-1) + index_y*tableSize;       //                         |
+//  int C = index_x + index_y*tableSize;           // node (i,j)              |
+//  int N = index_x + (index_y+1)*tableSize;       // node (i,j+1)            |
+//  int S = index_x + (index_y-1)*tableSize;       // node (i,j-1)     W ---- C ---- E
+//  int E = (index_x+1) + index_y*tableSize;       // node (i+1,j)            |
+//  int W = (index_x-1) + index_y*tableSize;       //                         |
                                                  //                         S 
 
 }
+/*
 __global__ void fillPlateWithTemperature( int *current,int *old)
 {
   int index_x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -62,7 +63,7 @@ __global__ void fillPlateWithTemperature( int *current,int *old)
 
     
 }
-
+*/
 
 int main(void)
 {
