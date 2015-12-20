@@ -19,7 +19,7 @@ __global__ void kernel(int *array)
   int index = index_y * grid_width + index_x;
 
   // use the two 2D block indices to compute a single linear block index
-  int result = blockIdx.y * gridDim.x + blockIdx.x;
+ // int result = blockIdx.y * gridDim.x + blockIdx.x;
 
   // write out the result
  // array[index] = result;
@@ -94,8 +94,8 @@ int main(void)
 
   // create 4x4 thread blocks
   dim3 block_size;
-  block_size.x = blocksize;
-  block_size.y = blocksize;
+  block_size.x = blocksize/2;
+  block_size.y = blocksize/2;
 
   // configure a two dimensional grid as well
   dim3 grid_size;
