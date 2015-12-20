@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-
+const int tableSize = 16;
 
 __global__ void kernel(int *array)
 {
@@ -21,14 +21,15 @@ __global__ void kernel(int *array)
   int result = blockIdx.y * gridDim.x + blockIdx.x;
 
   // write out the result
-  array[index] = result;
+ // array[index] = result;
+  array[index] = index_x + (index_y * tableSize); // shoult print out index of each cell.
 }
 
 
 int main(void)
 {
-  int num_elements_x = 16;
-  int num_elements_y = 16;
+  int num_elements_x = tableSize;
+  int num_elements_y = tableSize;
 
   int num_bytes = num_elements_x * num_elements_y * sizeof(int);
 
