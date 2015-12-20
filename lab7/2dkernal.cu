@@ -44,8 +44,8 @@ int main(void)
   // if either memory allocation failed, report an error message
   if(host_array == 0 || device_array == 0)
   {
-    printf("couldn't allocate memory\n");
-    return 1;
+    printf("couldn't allocate memory, host: %d, device: %d\n",host_array,device_array);
+  //  return 1;
   }
 
   // choose a two dimensional launch configuration
