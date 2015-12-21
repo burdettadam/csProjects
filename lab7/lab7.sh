@@ -10,5 +10,5 @@
 module load cuda/7.0.28
 
 
-nvcc -o lab7 test.cu
+nvcc -o lab7 test2.cu
 ./lab7
