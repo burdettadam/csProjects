@@ -26,6 +26,7 @@ int main() {
     for (int j = 0; j < row; j++) {
         for (int i = 0; i < col; i++) {
             host_matrix[j * col + i] = (j * col + i) + (j * col + i);
+            printf("%2d,%2d ", (j * col + i) , host_matrix[j * col + i] );
         }
     }
     size_t pitch;
