@@ -62,6 +62,7 @@ __global__ void kernel(float * d_matrix, size_t pitch) {
 
 void verify(float *h, float *d, int size) {
     for (int i = 0; i < size; i++) {
+        printf("h: %d,d: %d",h[i],d[i]);
         assert(h[i] == d[i]);
     }
     printf("Results match\n");
@@ -74,10 +75,10 @@ __global__ void fill(float * d_matrix, size_t pitch) {
            // row_d_matrix[i] = (j * M + i) + (j * M + i);
             row = j;
             col = i;
-            if (row == 0 || col == 0 || col == N-1 ){
+            if (row == 0 || col == 0 || col == M-1 ){
                 row_d_matrix[i] = 0.0;
             }
-            else if (row == (N - 1) ){
+            else if (row == (M - 1) ){
                 row_d_matrix[i] = 100.0;
             }
         }
