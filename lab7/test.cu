@@ -62,7 +62,8 @@ __global__ void kernel(float * d_matrix, size_t pitch) {
 
 void verify(float *h, float *d, int size) {
     for (int i = 0; i < size; i++) {
-        printf("h: %f,d: %f ",h[i],d[i]);
+        //printf("h: %f,d: %f ",h[i],d[i]);
+        printf("%d",i);
         assert(h[i] == d[i]);
     }
     printf("Results match\n");
