@@ -4,30 +4,13 @@
 #include <assert.h>
 
 #define BLOCKSIZE 1024
-#define MAXIT 1
 #define TOTROWS		(BLOCKSIZE*8)
 #define TOTCOLS		(BLOCKSIZE*8)
-#define NOTSETLOC       -1 // for cells that are not fixed
-
-#define QMAX(x,y) (((x) > (y))? (x): (y))
-
 
 float *iplate;
 float *host_matrix;
 int ncols, nrows;
 
-void Compute();
-
-
-int main(int argc, char *argv[])
-{
-	ncols = TOTCOLS;
-	nrows = TOTROWS;
-	cudaMalloc((void **) &iplate, nrows * ncols * sizeof(float));
-	Compute();
-
-	return 0;
-}
 
 __global__ void InitArrays(float *ip)
 {
@@ -61,7 +44,6 @@ void verify(float *h, float *d, int size) {
 void Compute()
 {
 	int blocksize = BLOCKSIZE;
-	float *device_matrix;
 	ncols = TOTCOLS;
 	nrows = TOTROWS;
 	host_matrix = (float *) malloc(ncols * nrows * sizeof(float));
@@ -70,10 +52,9 @@ void Compute()
             host_matrix[j * ncols + i] = (j * ncols + i);
         }
     }
-    cudaMalloc((void**)&device_matrix, (ncols*nrows)*sizeof(float));
     //cudaMemcpy(d_A, A, (N*N)*sizeof(float), cudaMemcpyHostToDevice);
 	// One block per row
-	InitArrays<<< nrows, blocksize >>>(device_matrix);
+	InitArrays<<< nrows, blocksize >>>(iplate);
 	  // print out the result element by element
 	  for(int row = 0; row < TOTROWS; ++row){
 	    for(int col = 0; col < TOTCOLS; ++col){
@@ -83,5 +64,15 @@ void Compute()
 	  }
 	  printf("\n");
 	 verify(host_matrix, iplate, TOTCOLS * TOTROWS);
+}
+
+int main(int argc, char *argv[])
+{
+	ncols = TOTCOLS;
+	nrows = TOTROWS;
+	cudaMalloc((void **) &iplate, nrows * ncols * sizeof(float));
+	Compute();
+
+	return 0;
 }
 
