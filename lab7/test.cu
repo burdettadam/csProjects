@@ -52,7 +52,7 @@ int main() {
 #define M 8192
 
 __global__ void kernel(float * d_matrix, size_t pitch) {
-    int colsPerThread = N/blockDim.y;
+    int colsPerThread = 8;//32 threads per block ,256 cells in block-> 256/32
     int rowstart = blockIdx.y * blockDim.y + (threadIdx.y * colsPerThread);
     for (int j = rowstart; j < rowstart+colsPerThread; j ++) {
         float* row_d_matrix = (float*)((char*)d_matrix + j*pitch);
@@ -147,7 +147,7 @@ int main() {
 
     //dim3 threadsPerBlock((1024/4), (1024/4), 1); // number of threads per block 256x256
     //dim3 numBlocks((N/threadsPerBlock.x),(M/threadsPerBlock.y), 1); // number of blocks in grid 32x32
-    dim3 threadsPerBlock(32, 32, 1); // number of threads per block 256x256
+    dim3 threadsPerBlock(32, 32, 1); // number of threads per block 
     dim3 numBlocks(N/threadsPerBlock.x,M/threadsPerBlock.y, 1); // number of blocks in grid 16x16
 
     kernel<<<numBlocks, threadsPerBlock>>>(d_matrix, pitch);
