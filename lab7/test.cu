@@ -85,7 +85,7 @@ int main() {
     size_t pitch;
     cudaMallocPitch(&d_matrix, &pitch, M * sizeof(float), N);
 
-    dim3 grid(1, 1, 1);
+    dim3 grid((1024/2),(1024/2), 1);
     dim3 block(3, 3, 1);
 
     kernel<<<grid, block>>>(d_matrix, pitch);
