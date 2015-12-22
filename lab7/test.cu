@@ -66,7 +66,7 @@ __global__ void kernel(float * d_matrix, size_t pitch) {
 void verify(float *h, float *d, int size) {
     for (int i = 0; i < size; i++) {
         //printf("h: %f,d: %f ",h[i],d[i]);
-        //printf("%d",i);
+        printf(" %d ",i);
         assert(h[i] == d[i]);
     }
     printf("Results match\n");
@@ -151,7 +151,7 @@ int main() {
     dim3 numBlocks(N/threadsPerBlock.x,M/threadsPerBlock.y, 1); // number of blocks in grid 16x16
 
     kernel<<<numBlocks, threadsPerBlock>>>(d_matrix, pitch);
-
+    cudaDeviceSynchronize();
     cudaError_t error = cudaGetLastError();
     if(error != cudaSuccess) {
         printf("%s\n",cudaGetErrorString(error));
