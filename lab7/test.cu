@@ -63,23 +63,22 @@ __global__ void kernel(float * d_matrix, size_t pitch) {
 void verify(float *h, float *d, int size) {
     for (int i = 0; i < size; i++) {
         //printf("h: %f,d: %f ",h[i],d[i]);
-       // printf("%d",i);
+        printf("%d",i);
         assert(h[i] == d[i]);
     }
     printf("Results match\n");
 }
 __global__ void fill(float * d_matrix, size_t pitch) {
-    int row, col;
-    for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < N; j ++) {
+    int index ;
+    for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < N; j += blockDim.y * gridDim.y) {
         float* row_d_matrix = (float*)((char*)d_matrix + j*pitch);
-        for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < M; i ++) {
+        for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < M; i += blockDim.x * gridDim.x) {
            // row_d_matrix[i] = (j * M + i) + (j * M + i);
-            row = j;
-            col = i;
-            if (row == 0 || col == 0 || col == M-1 ){
+            index = j * M + i;
+            if (index <= M || (index % (M-1)) == 0){
                 row_d_matrix[i] = 0.0;
             }
-            else if (row == (M - 1) ){
+            else if (index >= 67100672){// might be one off
                 row_d_matrix[i] = 100.0;
             }
         }
@@ -127,16 +126,15 @@ int main() {
     }
 */
 
-    int row,col;
+    int index;
     for (int j = 0 ; j < N; j++ ) {
         for (int i = 0 ; i < M; i++) {
-            row = j ;
-            col = i;
-            if (row == 0 || col == 0 || col == M-1 ){
+            index = j * M + i;
+            if (index <= M || (index % (M-1)) == 0){
                 h_matrix[j * M + i] = 0.0;
             }
-            else if (row == (M - 1) ){
-                h_matrix[j * M + col] = 100.0;
+            else if (index >= 67100672){// might be one off
+                h_matrix[j * M + i] = 100.0;
             }
         }
     }
