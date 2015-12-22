@@ -23,7 +23,7 @@ __global__ void kernel(int *array)
 
   // write out the result
  // array[index] = result;
-  array[index] = index_x + (index_y * tableSize); // should print out index of each cell.
+ // array[index] = index_x + (index_y * tableSize); // should print out index of each cell.
                                                  //                         N 
 //  int C = index_x + index_y*tableSize;           // node (i,j)              |
 //  int N = index_x + (index_y+1)*tableSize;       // node (i,j+1)            |
@@ -31,7 +31,15 @@ __global__ void kernel(int *array)
 //  int E = (index_x+1) + index_y*tableSize;       // node (i+1,j)            |
 //  int W = (index_x-1) + index_y*tableSize;       //                         |
                                                  //                         S 
-
+ // for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < (blocksize / 2); i += blockDim.x * gridDim.x){
+ //       y[i] = a * x[i] + y[i];
+ //   }
+  for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < (blocksize / 2); j += blockDim.y * gridDim.y) {
+      float* row_d_matrix = (float*)((char*)array + j*pitch);
+      for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < (blocksize / 2); i += blockDim.x * gridDim.x) {
+          row_d_matrix[i] = (j * M + i) + (j * M + i);
+      }
+  }
 }
 /*
 __global__ void fillPlateWithTemperature( int *current,int *old)
