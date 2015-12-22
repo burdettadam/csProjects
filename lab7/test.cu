@@ -62,7 +62,7 @@ __global__ void kernel(float * d_matrix, size_t pitch) {
 
 void verify(float *h, float *d, int size) {
     for (int i = 0; i < size; i++) {
-        printf("h: %d,d: %d ",h[i],d[i]);
+        printf("h: %f,d: %f ",h[i],d[i]);
         assert(h[i] == d[i]);
     }
     printf("Results match\n");
@@ -156,7 +156,7 @@ int main() {
         return 0;
     }
     cudaMemcpy2D(dc_matrix, M * sizeof(float), d_matrix, pitch, M * sizeof(float), N, cudaMemcpyDeviceToHost);
-    cudaError_t error = cudaGetLastError();
+    error = cudaGetLastError();
     if(error != cudaSuccess) {
         printf("%s\n",cudaGetErrorString(error));
         return 0;
