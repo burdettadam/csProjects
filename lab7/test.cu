@@ -72,7 +72,7 @@ __global__ void fill(float * d_matrix, size_t pitch) {
         float* row_d_matrix = (float*)((char*)d_matrix + j*pitch);
         for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < M; i += blockDim.x * gridDim.x) {
            // row_d_matrix[i] = (j * M + i) + (j * M + i);
-            row = j * N;
+            row = j;
             col = i;
             if (row == 0 || col == 0 || col == N-1 ){
                 row_d_matrix[i] = 0.0;
@@ -107,26 +107,7 @@ __global__ void fill(float * d_matrix, size_t pitch) {
     }
 */
 }
-void fillPlateWithTemperature( float* current,int tableSize){
-    int row,col;
-    for (int j = 0 ; j < tableSize; j++ ) {
-        for (int i = 0 ; i < tableSize; i++) {
-            row = j * tableSize;
-            col = i;
-            if (row == 0 || col == 0 || col == tableSize-1 ){
-                current[row + col] = 0.0;
-            }
-            else if (row == (tableSize - 1) ){
-                current[row + col] = 100.0;
-            }
-        }
-    }
- /*   for (int col = 0; col < 331 ; col++) {
-        current[400][col]=100.0;
-    }
-    current[200][500]=100.0;
-    */
-}
+
 
 int main() {
 
@@ -147,13 +128,13 @@ int main() {
     int row,col;
     for (int j = 0 ; j < N; j++ ) {
         for (int i = 0 ; i < M; i++) {
-            row = j * M;
+            row = j ;
             col = i;
             if (row == 0 || col == 0 || col == M-1 ){
-                h_matrix[row + col] = 0.0;
+                h_matrix[j * M + i] = 0.0;
             }
             else if (row == (M - 1) ){
-                h_matrix[row + col] = 100.0;
+                h_matrix[j * M + col] = 100.0;
             }
         }
     }
