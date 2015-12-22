@@ -150,7 +150,7 @@ int main() {
     dim3 threadsPerBlock(32, 32, 1); // number of threads per block 256x256
     dim3 numBlocks(N/threadsPerBlock.x,M/threadsPerBlock.y, 1); // number of blocks in grid 16x16
 
-    fill<<<numBlocks, threadsPerBlock>>>(d_matrix, pitch);
+    kernel<<<numBlocks, threadsPerBlock>>>(d_matrix, pitch);
 
     cudaError_t error = cudaGetLastError();
     if(error != cudaSuccess) {
