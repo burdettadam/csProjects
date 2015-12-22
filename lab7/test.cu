@@ -52,14 +52,14 @@ int main() {
 #define M 8192
 
 __global__ void kernel(float * d_matrix, size_t pitch) {
-    int colsPerThread = 8;//32 threads per block ,256 cells in block-> 256/32
+    int colsPerThread = 4;//32 threads per block ,256 cells in block-> 256/32
     int rowstart = blockIdx.y * blockDim.y + (threadIdx.y * colsPerThread);
     for (int j = rowstart; j < rowstart+colsPerThread; j ++) {
         float* row_d_matrix = (float*)((char*)d_matrix + j*pitch);
-      //  int colstart = blockIdx.x * blockDim.x + (threadIdx.x * colsPerThread);
-      //  for (int i = colstart; i < colstart + colsPerThread; i ++) {
-      //      row_d_matrix[i] = i;
-      //  }
+        int colstart = blockIdx.x * blockDim.x + (threadIdx.x * colsPerThread);
+        for (int i = colstart; i < colstart + colsPerThread; i ++) {
+            row_d_matrix[i] = i;
+        }
     }
 }
 
