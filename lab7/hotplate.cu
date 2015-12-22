@@ -4,8 +4,19 @@
 #include <stdio.h>
 const int tableSize = 8192;
 const int blocksize = 1024;
+__global__ void sumreduct(size_t pitch, float* dev_vector, float* dev_matrix, int  columns, int N)
+{
+int idx = threadIdx.x + blockIdx.x * blockDim.x;
+int stride = blockDim.x * gridDim.x;
 
-__global__ void kernel(int *array)
+while(idx<N)
+{
+    dev_vector[idx] = *(float *)( ((char*)dev_matrix + idx * pitch) + columns);
+    idx += stride;
+} 
+}
+
+__global__ void kernel(float *array, size_t pitch)
 {
   // compute the two dimensional index of this particular
   // thread in the grid
@@ -34,10 +45,11 @@ __global__ void kernel(int *array)
  // for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < (blocksize / 2); i += blockDim.x * gridDim.x){
  //       y[i] = a * x[i] + y[i];
  //   }
-  for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < (blocksize / 2); j += blockDim.y * gridDim.y) {
+  for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < tableSize; j += blockDim.y * gridDim.y) {
       float* row_d_matrix = (float*)((char*)array + j*pitch);
-      for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < (blocksize / 2); i += blockDim.x * gridDim.x) {
-          row_d_matrix[i] = (j * M + i) + (j * M + i);
+      for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < tableSize; i += blockDim.x * gridDim.x) {
+          row_d_matrix[i] = i;
+         // row_d_matrix[i] = (j * tableSize + i) + (j * tableSize + i);
       }
   }
 }
@@ -73,6 +85,8 @@ __global__ void fillPlateWithTemperature( int *current,int *old)
     
 }
 */
+int iDivUp(int a, int b){ return ((a % b) != 0) ? (a / b + 1) : (a / b); }
+
 
 int main(void)
 {
@@ -81,24 +95,13 @@ int main(void)
 
   int num_bytes = num_elements_x * num_elements_y * sizeof(int);
 
-  int *device_array = 0;
-  int *host_array = 0;
-
-  // malloc a host array
-  host_array = (int*)malloc(num_bytes);
-
+  float *device_array = 0;
+  float host_array [tableSize][tableSize];
+  size_t pitch;
   // cudaMalloc a device array
-  cudaMalloc((void**)&device_array, num_bytes);
+  cudaMallocPitch(&device_array, &pitch, tableSize * sizeof(float), tableSize * sizeof(float));
+  cudaMemcpy2D(device_array,pitch,host_array,tableSize * sizeof(float),tableSize * sizeof(float),tableSize, cudaMemcpyHostToDevice);
 
-  // if either memory allocation failed, report an error message
-  if(host_array == 0 || device_array == 0)
-  {
-    printf("couldn't allocate memory, host: %d, device: %d\n",host_array,device_array);
-  //  return 1;
-  }
-
-  // choose a two dimensional launch configuration
-  // use the dim3 type when launches are not one dimensional
 
   // create 512x512 thread blocks
   dim3 block_size;
@@ -107,14 +110,15 @@ int main(void)
 
   // configure a two dimensional grid as well
   dim3 grid_size;
-  grid_size.x = num_elements_x / block_size.x;
-  grid_size.y = num_elements_y / block_size.y;
+  grid_size.x = iDivUp( num_elements_x , block_size.x);
+  grid_size.y = iDivUp( num_elements_y , block_size.y);
 
   // grid_size & block_size are passed as arguments to the
   // triple chevrons as usual
-  kernel<<<grid_size,block_size>>>(device_array);
+  kernel<<<grid_size,block_size>>>( device_array, pitch );
 
   // download and inspect the result on the host:
+  cudaMemcpy2D(host_array, pitch , device_array,  tableSize * sizeof(float),tableSize * sizeof(float),tableSize, cudaMemcpyDeviceToHost);
   cudaMemcpy(host_array, device_array, num_bytes, cudaMemcpyDeviceToHost);
 
   // print out the result element by element
