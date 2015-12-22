@@ -89,7 +89,12 @@ int main() {
     dim3 block((1024/2), (1024/2), 1); // number of threads per block
 
     kernel<<<grid, block>>>(d_matrix, pitch);
-
+    
+    cudaError_t error = cudaGetLastError();
+    if(error != cudaSuccess) {
+        printf("%s\n",cudaGetErrorString(error));
+        return 0;
+    }
     cudaMemcpy2D(dc_matrix, M * sizeof(float), d_matrix, pitch, M * sizeof(float), N, cudaMemcpyDeviceToHost);
 
     verify(h_matrix, dc_matrix, M * N);
