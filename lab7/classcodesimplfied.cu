@@ -11,9 +11,7 @@ float *iplate;
 float *host_matrix;
 int ncols, nrows;
 
-
-__global__ void InitArrays(float *ip)
-{
+__global__ void InitArrays(float *ip){
 	int i;
 	// ncols is the same as number of threads
         // Each block gets a row, each thread will fill part of a row

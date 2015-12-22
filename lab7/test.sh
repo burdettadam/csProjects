@@ -10,5 +10,5 @@
 module load cuda/7.0.28
 
 
-nvcc -o lab7 classcodesimplfied.cu
-./lab7
+nvcc -o test test.cu
+./test
