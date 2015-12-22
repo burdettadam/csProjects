@@ -87,8 +87,8 @@ int main() {
 
     //dim3 threadsPerBlock((1024/4), (1024/4), 1); // number of threads per block 256x256
     //dim3 numBlocks((N/threadsPerBlock.x),(M/threadsPerBlock.y), 1); // number of blocks in grid 32x32
-    dim3 threadsPerBlock(256, 256, 1); // number of threads per block 256x256
-    dim3 numBlocks(8,8, 1); // number of blocks in grid 16x16
+    dim3 threadsPerBlock(32, 32, 1); // number of threads per block 256x256
+    dim3 numBlocks(N/threadsPerBlock.x,M/threadsPerBlock.y, 1); // number of blocks in grid 16x16
 
     kernel<<<numBlocks, threadsPerBlock>>>(d_matrix, pitch);
 
