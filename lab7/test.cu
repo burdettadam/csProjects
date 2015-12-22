@@ -52,9 +52,12 @@ int main() {
 #define M 8192
 
 __global__ void kernel(float * d_matrix, size_t pitch) {
-    for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < N; j += blockDim.y * gridDim.y) {
+    int colsPerThread = N/blockDim.y;
+    int rowstart = blockIdx.y * blockDim.y + (threadIdx.y * colsPerThread);
+    for (int j = rowstart; j < rowstart+colsPerThread; j ++) {
         float* row_d_matrix = (float*)((char*)d_matrix + j*pitch);
-        for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < M; i += blockDim.x * gridDim.x) {
+        int colstart = blockIdx.x * blockDim.x + (threadIdx.x * colsPerThread);
+        for (int i = colstart; i < colstart + colsPerThread; i ++) {
             row_d_matrix[i] = (j * M + i) + (j * M + i);
         }
     }
@@ -118,14 +121,14 @@ int main() {
 
     h_matrix = (float *) malloc(M * N * sizeof(float));
     dc_matrix = (float *) malloc(M * N * sizeof(float));
-/*
+
     for (int j = 0; j < N; j++) {
         for (int i = 0; i < M; i++) {
             h_matrix[j * M + i] = (j * M + i) + (j * M + i);
         }
     }
-*/
 
+/*
     int index;
     for (int j = 0 ; j < N; j++ ) {
         for (int i = 0 ; i < M; i++) {
@@ -138,7 +141,7 @@ int main() {
             }
         }
     }
-
+*/
     size_t pitch;
     cudaMallocPitch(&d_matrix, &pitch, M * sizeof(float), N);
 
