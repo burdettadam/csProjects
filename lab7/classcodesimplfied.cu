@@ -29,21 +29,22 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-__global__ void InitArrays(float *ip, int ncols)
+__global__ void InitArrays(float *ip)
 {
 	int i;
 	// ncols is the same as number of threads
         // Each block gets a row, each thread will fill part of a row
 	// Calculate the offset of the row
-    int blockOffset = blockIdx.x * ncols; // first possion in array of the block3
+    int blockOffset = blockIdx.x * TOTCOLS; // first possion in array of the block3
         // The number of cols per thread
-    int colsPerThread = ncols/blockDim.x;
+    int colsPerThread = TOTCOLS/blockDim.x;
         // Calculate our offset into the row for the thread
 	int colStartPos = threadIdx.x * (colsPerThread); // col index 
 	// position = arrayaddress + position of block + position of thread
 	//int col = threadIdx.x + blockIdx.x * colsPerThread ;//* blockDim.x // I thick this is correct..
-	int col = colStartPos;
-	int row = blockIdx.x ;
+	//int col = colStartPos;
+	//int row = blockIdx.x ;
+
 	float *ippos = ip + blockOffset+ colStartPos;
 
 	for (i = 0; i < colsPerThread; i++) {
@@ -60,6 +61,7 @@ void verify(float *h, float *d, int size) {
 void Compute()
 {
 	int blocksize = BLOCKSIZE;
+	float *device_matrix;
 	ncols = TOTCOLS;
 	nrows = TOTROWS;
 	host_matrix = (float *) malloc(ncols * nrows * sizeof(float));
@@ -68,10 +70,10 @@ void Compute()
             host_matrix[j * ncols + i] = (j * ncols + i);
         }
     }
-    //cudaMalloc((void**)&d_A, (N*N)*sizeof(float));
+    cudaMalloc((void**)&device_matrix, (ncols*nrows)*sizeof(float));
     //cudaMemcpy(d_A, A, (N*N)*sizeof(float), cudaMemcpyHostToDevice);
 	// One block per row
-	InitArrays<<< nrows, blocksize >>>(iplate, ncols);
+	InitArrays<<< nrows, blocksize >>>(device_matrix);
 	  // print out the result element by element
 	  for(int row = 0; row < TOTROWS; ++row){
 	    for(int col = 0; col < TOTCOLS; ++col){
