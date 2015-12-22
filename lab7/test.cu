@@ -48,8 +48,8 @@ int main() {
 #include <stdio.h>
 #include <assert.h>
 
-#define N 11
-#define M 11
+#define N 110
+#define M 110
 
 __global__ void kernel(float * d_matrix, size_t pitch) {
     for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < N; j += blockDim.y * gridDim.y) {
