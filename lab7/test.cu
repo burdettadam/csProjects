@@ -12,7 +12,7 @@ __global__ void kernel(float * device_matrix, size_t pitch) {
 }
 void verify(float *h, float *d, int size) {
     for (int i = 0; i < size; i++) {
-        printf("%2d ",d[i]);
+        printf("%2f ",d[i]);
         assert(h[i] == d[i]);
     }
     printf("Results match\n");
@@ -26,7 +26,7 @@ int main() {
     for (int j = 0; j < row; j++) {
         for (int i = 0; i < col; i++) {
             host_matrix[j * col + i] = (j * col + i) + (j * col + i);
-            printf("%2d,%2d ", (j * col + i) , host_matrix[j * col + i] );
+            printf("%2d,%2f ", (j * col + i) , host_matrix[j * col + i] );
         }
     }
     size_t pitch;
