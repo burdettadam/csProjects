@@ -52,7 +52,7 @@ int main() {
 #define M 8192
 
 __global__ void kernel(float * d_matrix, size_t pitch) {
-    int colsPerThread = 4;//32 threads per block ,256 cells in block-> 256/32
+    int colsPerThread = 3;//32 threads per block ,256 cells in block-> 256/32
     int rowstart = blockIdx.y * blockDim.y + (threadIdx.y * colsPerThread);
     for (int j = rowstart; j < rowstart+colsPerThread; j ++) {
         float* row_d_matrix = (float*)((char*)d_matrix + j*pitch);

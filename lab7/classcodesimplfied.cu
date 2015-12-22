@@ -29,7 +29,7 @@ __global__ void InitArrays(float *ip){
 	float *ippos = ip + blockOffset+ colStartPos;
 
 	for (i = 0; i < colsPerThread; i++) {
-		ippos[i] = i;
+		ippos[i] = 50;
 	}
 }
 void verify(float *h, float *d, int size) {
@@ -47,7 +47,7 @@ void Compute()
 	host_matrix = (float *) malloc(ncols * nrows * sizeof(float));
     for (int j = 0; j < nrows; j++) {
         for (int i = 0; i < ncols; i++) {
-            host_matrix[j * ncols + i] = (j * ncols + i);
+            host_matrix[j * ncols + i] = 50;
         }
     }
     //cudaMemcpy(d_A, A, (N*N)*sizeof(float), cudaMemcpyHostToDevice);
