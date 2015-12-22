@@ -96,9 +96,10 @@ int main(void)
   int num_bytes = num_elements_x * num_elements_y * sizeof(int);
 
   float *device_array = 0;
-  float host_array [tableSize][tableSize];
+  float *host_array = 0;
   size_t pitch;
   // cudaMalloc a device array
+  host_array = (float*)malloc(num_bytes);
   cudaMallocPitch(&device_array, &pitch, tableSize * sizeof(float), tableSize * sizeof(float));
   cudaMemcpy2D(device_array,pitch,host_array,tableSize * sizeof(float),tableSize * sizeof(float),tableSize, cudaMemcpyHostToDevice);
 
