@@ -63,16 +63,16 @@ __global__ void kernel(float * d_matrix, size_t pitch) {
 void verify(float *h, float *d, int size) {
     for (int i = 0; i < size; i++) {
         //printf("h: %f,d: %f ",h[i],d[i]);
-        printf("%d",i);
+       // printf("%d",i);
         assert(h[i] == d[i]);
     }
     printf("Results match\n");
 }
 __global__ void fill(float * d_matrix, size_t pitch) {
     int row, col;
-    for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < N; j += blockDim.y * gridDim.y) {
+    for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < N; j ++) {
         float* row_d_matrix = (float*)((char*)d_matrix + j*pitch);
-        for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < M; i += blockDim.x * gridDim.x) {
+        for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < M; i ++) {
            // row_d_matrix[i] = (j * M + i) + (j * M + i);
             row = j;
             col = i;
