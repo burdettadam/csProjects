@@ -48,8 +48,8 @@ int main() {
 #include <stdio.h>
 #include <assert.h>
 
-#define N 160
-#define M 160
+#define N 8192
+#define M 8192
 
 __global__ void kernel(float * d_matrix, size_t pitch) {
     for (int j = blockIdx.y * blockDim.y + threadIdx.y; j < N; j += blockDim.y * gridDim.y) {
@@ -85,11 +85,11 @@ int main() {
     size_t pitch;
     cudaMallocPitch(&d_matrix, &pitch, M * sizeof(float), N);
 
-    dim3 grid((N/16),(M/16), 1); // number of blocks in grid
-    dim3 block((1024/2), (1024/2), 1); // number of threads per block
+    dim3 threadsPerBlock((1024/4), (1024/4), 1); // number of threads per block 256x256
+    dim3 numBlocks((N/threadsPerBlock.x),(M/threadsPerBlock.y), 1); // number of blocks in grid 32x32
 
-    kernel<<<grid, block>>>(d_matrix, pitch);
-    
+    kernel<<<numBlocks, threadsPerBlock>>>(d_matrix, pitch);
+
     cudaError_t error = cudaGetLastError();
     if(error != cudaSuccess) {
         printf("%s\n",cudaGetErrorString(error));
