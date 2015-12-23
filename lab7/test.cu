@@ -148,6 +148,9 @@ int main() {
             else if (index >= 67100672){// might be one off
                 h_matrix[j * M + i] = 100.0;
             }
+            else{
+                row_d_matrix[i] = 50;
+            }
         }
     }
     size_t pitch;
