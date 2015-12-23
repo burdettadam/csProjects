@@ -68,6 +68,7 @@ void verify(float *h, float *d, int size) {
         //printf("h: %f,d: %f ",h[i],d[i]);
         //printf(" %d ",i);
         //assert(h[i] == d[i]);
+        cudaDeviceSynchronize();
         if (h[i] != d[i]){
             printf("h[%d]= %f,d[%d]= %f ",i, h[i] ,i , d[i] );
         }
