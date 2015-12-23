@@ -163,6 +163,7 @@ int main() {
         return 0;
     }
     cudaMemcpy2D(dc_matrix, M * sizeof(float), d_matrix, pitch, M * sizeof(float), N, cudaMemcpyDeviceToHost);
+    cudaDeviceSynchronize();
     error = cudaGetLastError();
     if(error != cudaSuccess) {
         printf("%s\n",cudaGetErrorString(error));
