@@ -149,7 +149,7 @@ int main() {
                 h_matrix[j * M + i] = 100.0;
             }
             else{
-                row_d_matrix[i] = 50;
+                h_matrix[i] = 50;
             }
         }
     }
