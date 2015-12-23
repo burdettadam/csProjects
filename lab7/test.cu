@@ -67,10 +67,10 @@ void verify(float *h, float *d, int size) {
     for (int i = 0; i < size; i++) {
         //printf("h: %f,d: %f ",h[i],d[i]);
         //printf(" %d ",i);
-        assert(h[i] == d[i]);
-        //if (h[i] != d[i]){
-        //    printf("h[%d]= %f,d[%d]= %f ",i, h[i] ,i , d[i] );
-       // }
+        //assert(h[i] == d[i]);
+        if (h[i] != d[i]){
+            printf("h[%d]= %f,d[%d]= %f ",i, h[i] ,i , d[i] );
+        }
     }
     printf("Results match\n");
 }
