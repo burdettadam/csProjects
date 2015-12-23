@@ -92,7 +92,7 @@ __global__ void fill(float * d_matrix, size_t pitch) {
                 row_d_matrix[i] = 100.0;
             }
             else{
-                row_d_matrix[i] = 50;
+                row_d_matrix[i] = 50.0;
             }
         }
     }
@@ -142,14 +142,14 @@ int main() {
     for (int j = 0 ; j < N; j++ ) {
         for (int i = 0 ; i < M; i++) {
             index = j * M + i;
-            if (index <= M || (index % (M-1)) == 0){
+            if (j == 0 || i == 0 || i == M-1){
                 h_matrix[j * M + i] = 0.0;
             }
-            else if (index >= 67100672){// might be one off
+            else if (row == M-1){// might be one off
                 h_matrix[j * M + i] = 100.0;
             }
             else{
-                h_matrix[i] = 50;
+                h_matrix[i] = 50.0;
             }
         }
     }
