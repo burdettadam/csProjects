@@ -48,8 +48,8 @@ int main() {
 #include <stdio.h>
 #include <assert.h>
 
-#define N 512
-#define M 512
+#define N 8192
+#define M 8192
 
 __global__ void kernel(float * d_matrix, size_t pitch) {
     int colsPerThread = 1;//32 threads per block ,256 cells in block-> 256/32
