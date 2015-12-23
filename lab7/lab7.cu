@@ -258,8 +258,8 @@ int main() {
         int timeit;
         for(timeit = 0; timeit < 10000; timeit++){
             //reduce1<<<1, 1024, 1024*sizeof(int)>>>(keepgoing_sums, keepgoing_single);
-            reduce2<<<1, 1024, 1024*sizeof(int)>>>(keepgoing_sums, keepgoing_single);
-            //reduce3<<<1, 1024, 1024*sizeof(int)>>>(keepgoing_sums, keepgoing_single);
+            //reduce2<<<1, 1024, 1024*sizeof(int)>>>(keepgoing_sums, keepgoing_single);
+            reduce3<<<1, 1024, 1024*sizeof(int)>>>(keepgoing_sums, keepgoing_single);
             cudaDeviceSynchronize();
             error = cudaGetLastError();
             if(error != cudaSuccess) {
