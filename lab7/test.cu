@@ -48,8 +48,8 @@ int main() {
 #include <stdio.h>
 #include <assert.h>
 
-#define N 8192
-#define M 8192
+#define N 1024
+#define M 1024
 
 __global__ void kernel(float * d_matrix, size_t pitch) {
     int colsPerThread = 1;//32 threads per block ,256 cells in block-> 256/32
@@ -68,10 +68,8 @@ void verify(float *h, float *d, int size) {
         //printf("h: %f,d: %f ",h[i],d[i]);
         //printf(" %d ",i);
         //assert(h[i] == d[i]);
-        cudaDeviceSynchronize();
         if (h[i] != d[i]){
             printf("h[%d]= %f,d[%d]= %f ",i, h[i] ,i , d[i] );
-        cudaDeviceSynchronize();
         }
     }
     printf("Results match\n");
@@ -154,7 +152,6 @@ int main() {
     //dim3 numBlocks((N/threadsPerBlock.x),(M/threadsPerBlock.y), 1); // number of blocks in grid 32x32
     dim3 threadsPerBlock(32, 32, 1); // number of threads per block 
     dim3 numBlocks(N/threadsPerBlock.x,M/threadsPerBlock.y, 1); // number of blocks in grid 16x16
-    cudaDeviceSynchronize();
     kernel<<<numBlocks, threadsPerBlock>>>(d_matrix, pitch);
     cudaDeviceSynchronize();
     cudaError_t error = cudaGetLastError();
@@ -163,7 +160,6 @@ int main() {
         return 0;
     }
     cudaMemcpy2D(dc_matrix, M * sizeof(float), d_matrix, pitch, M * sizeof(float), N, cudaMemcpyDeviceToHost);
-    cudaDeviceSynchronize();
     error = cudaGetLastError();
     if(error != cudaSuccess) {
         printf("%s\n",cudaGetErrorString(error));
