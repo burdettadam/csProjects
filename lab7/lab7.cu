@@ -202,7 +202,7 @@ int main() {
 
     //h_matrix = (float *) malloc(M * N * sizeof(float));
     //dc_matrix = (float *) malloc(M * N * sizeof(float));
-    double t0, tottime;
+    double t0, tottime, start = When();
     size_t ipitch;
     size_t opitch;
     size_t lpitch;
@@ -260,6 +260,7 @@ int main() {
             reduce1<<<1, 1024, 1024*sizeof(int)>>>(keepgoing_sums, keepgoing_single);
             //reduce2<<<1, 1024, 1024*sizeof(int)>>>(keepgoing_sums, keepgoing_single);
             //reduce3<<<1, 1024, 1024*sizeof(int)>>>(keepgoing_sums, keepgoing_single);
+            cudaDeviceSynchronize();
             error = cudaGetLastError();
             if(error != cudaSuccess) {
                 printf("%s\n",cudaGetErrorString(error));
@@ -281,5 +282,5 @@ int main() {
     cudaFree(oplate); 
     cudaFree(keepgoing_single); 
     cudaFree(keepgoing_sums);
-    printf("Finished in %d iterations, with reduce average time in %f.\n", iteration,totaltime);
+    printf("Finished in %d iterations at %f, with reduce average time in %f.\n", iteration,When()-start,totaltime);
 }
