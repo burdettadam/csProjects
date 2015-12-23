@@ -48,8 +48,8 @@ int main() {
 #include <stdio.h>
 #include <assert.h>
 
-#define N 8192
-#define M 8192
+#define N 1024
+#define M 1024
 
 __global__ void kernel(float * d_matrix, size_t pitch) {
     int colsPerThread = 1;//32 threads per block ,256 cells in block-> 256/32
@@ -90,6 +90,9 @@ __global__ void fill(float * d_matrix, size_t pitch) {
             }
             else if (index >= 67100672){// might be one off
                 row_d_matrix[i] = 100.0;
+            }
+            else{
+                row_d_matrix[i] = 50;
             }
         }
     }
