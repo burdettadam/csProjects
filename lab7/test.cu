@@ -70,7 +70,7 @@ void verify(float *h, float *d, int size) {
         //assert(h[i] == d[i]);
         if (h[i] != d[i]){
             printf("h[%d]= %f,d[%d]= %f ",i, h[i] ,i , d[i] );
-            return;
+            //return;
         }
     }
     printf("Results match\n");
