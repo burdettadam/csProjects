@@ -58,7 +58,7 @@ __global__ void kernel(float * d_matrix, size_t pitch) {
         float* row_d_matrix = (float*)((char*)d_matrix + j*pitch);
         int colstart = blockIdx.x * blockDim.x + (threadIdx.x * colsPerThread);
         for (int i = colstart; i < colstart + colsPerThread; i ++) {
-            row_d_matrix[i] = j + i;
+            row_d_matrix[i] = j * M + i;
         }
     }
 }
