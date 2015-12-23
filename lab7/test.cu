@@ -71,6 +71,7 @@ void verify(float *h, float *d, int size) {
         cudaDeviceSynchronize();
         if (h[i] != d[i]){
             printf("h[%d]= %f,d[%d]= %f ",i, h[i] ,i , d[i] );
+        cudaDeviceSynchronize();
         }
     }
     printf("Results match\n");
@@ -153,7 +154,7 @@ int main() {
     //dim3 numBlocks((N/threadsPerBlock.x),(M/threadsPerBlock.y), 1); // number of blocks in grid 32x32
     dim3 threadsPerBlock(32, 32, 1); // number of threads per block 
     dim3 numBlocks(N/threadsPerBlock.x,M/threadsPerBlock.y, 1); // number of blocks in grid 16x16
-
+    cudaDeviceSynchronize();
     kernel<<<numBlocks, threadsPerBlock>>>(d_matrix, pitch);
     cudaDeviceSynchronize();
     cudaError_t error = cudaGetLastError();
