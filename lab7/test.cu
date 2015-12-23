@@ -145,7 +145,7 @@ int main() {
             if (j == 0 || i == 0 || i == M-1){
                 h_matrix[j * M + i] = 0.0;
             }
-            else if (row == M-1){// might be one off
+            else if (j == M-1){// might be one off
                 h_matrix[j * M + i] = 100.0;
             }
             else{
